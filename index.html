@@ -5,6 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Generator kart Ja mam / Kto ma</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="stylesheet" href="styles.css" />
     <script
       src="https://cdn.tiny.cloud/1/rvwao9ib8mj0j8bfxbp4dml22na1rnlbgwu4wvfkitbd7dr3/tinymce/6/tinymce.min.js"
@@ -56,180 +57,182 @@
             <h2>Ustawienia</h2>
           </div>
 
-          <div class="settings-box">
+          <div class="settings-box settings-box--styles">
             <div class="settings-grid settings-grid--single">
               <label>
                 Zestaw stylów
                 <select id="style-preset"></select>
               </label>
             </div>
-
-            <div class="settings-tabs">
-              <button class="settings-tab active" data-settings-tab="text" type="button">Tekst</button>
-              <button class="settings-tab" data-settings-tab="background" type="button">Tło</button>
-              <button class="settings-tab" data-settings-tab="border" type="button">Obramowanie</button>
-              <button class="settings-tab" data-settings-tab="line" type="button">Linia</button>
-              <button class="settings-tab" data-settings-tab="effects" type="button">Efekty</button>
-            </div>
           </div>
 
-          <div class="settings-tab-content" data-settings-panel="text">
-            <div class="settings-grid">
-              <label>
-                Kolor tekstu
-                <input id="text-color" type="color" />
-              </label>
-              <label class="checkbox">
-                <input id="text-shadow" type="checkbox" />
-                Cień tekstu
-              </label>
-              <label class="field-font-system">
-                Czcionka systemowa
-                <select id="font-name">
-                  <option value="Times New Roman">Times New Roman</option>
-                  <option value="Arial">Arial</option>
-                  <option value="Verdana">Verdana</option>
-                  <option value="Tahoma">Tahoma</option>
-                  <option value="Georgia">Georgia</option>
-                  <option value="Courier New">Courier New</option>
-                </select>
-              </label>
-              <label class="field-font-google">
-                Google Font (nazwa)
-                <input id="font-google" type="text" placeholder="np. Roboto" />
-              </label>
-              <label class="checkbox">
-                <input id="font-google-enabled" type="checkbox" />
-                Używaj Google Fonts
-              </label>
-              <label>
-                Rozmiar czcionki
-                <select id="font-size-mode">
-                  <option value="auto">Auto</option>
-                  <option value="fixed">Stały</option>
-                </select>
-              </label>
-              <label>
-                Rozmiar (pt)
-                <input id="font-size-fixed" type="number" min="8" max="72" />
-              </label>
-            </div>
-            <div class="font-status" id="font-status"></div>
-            <div class="font-status warning" id="text-fit-warning"></div>
+          <div class="settings-tabs">
+            <button class="settings-tab active" data-settings-tab="text" type="button">Tekst</button>
+            <button class="settings-tab" data-settings-tab="background" type="button">Tło</button>
+            <button class="settings-tab" data-settings-tab="border" type="button">Obramowanie</button>
+            <button class="settings-tab" data-settings-tab="line" type="button">Linia</button>
+            <button class="settings-tab" data-settings-tab="effects" type="button">Efekty</button>
           </div>
 
-          <div class="settings-tab-content hidden" data-settings-panel="background">
-            <div class="settings-grid">
-              <label>
-                Tryb tła
-                <select id="card-bg-mode">
-                  <option value="white">Białe</option>
-                  <option value="color">Kolor</option>
-                  <option value="gradient">Gradient</option>
-                </select>
-              </label>
-              <label class="field-bg-color">
-                Kolor tła
-                <input id="card-bg-color" type="color" />
-              </label>
-              <label class="field-bg-gradient">
-                Typ gradientu
-                <select id="card-bg-gradient-type">
-                  <option value="linear">Liniowy</option>
-                  <option value="radial">Radialny</option>
-                </select>
-              </label>
-              <label class="field-bg-gradient">
-                Kierunek gradientu
-                <select id="card-bg-gradient-direction">
-                  <option value="vertical">Pionowy</option>
-                  <option value="horizontal">Poziomy</option>
-                  <option value="diagonal">Ukośny</option>
-                </select>
-              </label>
-              <label class="field-bg-gradient">
-                Kolor gradientu 1
-                <input id="card-bg-grad-1" type="color" />
-              </label>
-              <label class="field-bg-gradient">
-                Kolor gradientu 2
-                <input id="card-bg-grad-2" type="color" />
-              </label>
+          <div class="settings-card">
+            <div class="settings-tab-content" data-settings-panel="text">
+              <div class="settings-grid">
+                <label>
+                  Kolor tekstu
+                  <input id="text-color" type="color" />
+                </label>
+                <label class="checkbox">
+                  <input id="text-shadow" type="checkbox" />
+                  Cień tekstu
+                </label>
+                <label class="field-font-system">
+                  Czcionka systemowa
+                  <select id="font-name">
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Tahoma">Tahoma</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Courier New">Courier New</option>
+                  </select>
+                </label>
+                <label class="field-font-google">
+                  Google Font (nazwa)
+                  <input id="font-google" type="text" placeholder="np. Roboto" />
+                </label>
+                <label class="checkbox">
+                  <input id="font-google-enabled" type="checkbox" />
+                  Używaj Google Fonts
+                </label>
+                <label>
+                  Rozmiar czcionki
+                  <select id="font-size-mode">
+                    <option value="auto">Auto</option>
+                    <option value="fixed">Stały</option>
+                  </select>
+                </label>
+                <label>
+                  Rozmiar (pt)
+                  <input id="font-size-fixed" type="number" min="8" max="72" />
+                </label>
+              </div>
+              <div class="font-status" id="font-status"></div>
+              <div class="font-status warning" id="text-fit-warning"></div>
             </div>
-          </div>
 
-          <div class="settings-tab-content hidden" data-settings-panel="border">
-            <div class="settings-grid">
-              <label class="checkbox">
-                <input id="card-border-enabled" type="checkbox" />
-                Obramowanie
-              </label>
-              <label class="field-border">
-                Kolor obramowania
-                <input id="card-border-color" type="color" />
-              </label>
-              <label class="field-border">
-                Grubość (px)
-                <input id="card-border-width" type="number" min="0" max="12" />
-              </label>
-              <label class="field-border">
-                Styl obramowania
-                <select id="card-border-style">
-                  <option value="solid">Ciągła</option>
-                  <option value="dashed">Przerywana</option>
-                  <option value="dotted">Kropkowana</option>
-                </select>
-              </label>
+            <div class="settings-tab-content hidden" data-settings-panel="background">
+              <div class="settings-grid">
+                <label>
+                  Tryb tła
+                  <select id="card-bg-mode">
+                    <option value="white">Białe</option>
+                    <option value="color">Kolor</option>
+                    <option value="gradient">Gradient</option>
+                  </select>
+                </label>
+                <label class="field-bg-color">
+                  Kolor tła
+                  <input id="card-bg-color" type="color" />
+                </label>
+                <label class="field-bg-gradient">
+                  Typ gradientu
+                  <select id="card-bg-gradient-type">
+                    <option value="linear">Liniowy</option>
+                    <option value="radial">Radialny</option>
+                  </select>
+                </label>
+                <label class="field-bg-gradient">
+                  Kierunek gradientu
+                  <select id="card-bg-gradient-direction">
+                    <option value="vertical">Pionowy</option>
+                    <option value="horizontal">Poziomy</option>
+                    <option value="diagonal">Ukośny</option>
+                  </select>
+                </label>
+                <label class="field-bg-gradient">
+                  Kolor gradientu 1
+                  <input id="card-bg-grad-1" type="color" />
+                </label>
+                <label class="field-bg-gradient">
+                  Kolor gradientu 2
+                  <input id="card-bg-grad-2" type="color" />
+                </label>
+              </div>
             </div>
-          </div>
 
-          <div class="settings-tab-content hidden" data-settings-panel="line">
-            <div class="settings-grid">
-              <label class="checkbox">
-                <input id="card-line-enabled" type="checkbox" />
-                Linia środkowa
-              </label>
-              <label class="field-line">
-                Kolor linii
-                <input id="card-line-color" type="color" />
-              </label>
-              <label class="field-line">
-                Grubość (px)
-                <input id="card-line-width" type="number" min="0" max="12" />
-              </label>
-              <label class="field-line">
-                Styl linii
-                <select id="card-line-style">
-                  <option value="solid">Ciągła</option>
-                  <option value="dashed">Przerywana</option>
-                  <option value="dotted">Kropkowana</option>
-                </select>
-              </label>
+            <div class="settings-tab-content hidden" data-settings-panel="border">
+              <div class="settings-grid">
+                <label class="checkbox">
+                  <input id="card-border-enabled" type="checkbox" />
+                  Obramowanie
+                </label>
+                <label class="field-border">
+                  Kolor obramowania
+                  <input id="card-border-color" type="color" />
+                </label>
+                <label class="field-border">
+                  Grubość (px)
+                  <input id="card-border-width" type="number" min="0" max="12" />
+                </label>
+                <label class="field-border">
+                  Styl obramowania
+                  <select id="card-border-style">
+                    <option value="solid">Ciągła</option>
+                    <option value="dashed">Przerywana</option>
+                    <option value="dotted">Kropkowana</option>
+                  </select>
+                </label>
+              </div>
             </div>
-          </div>
 
-          <div class="settings-tab-content hidden" data-settings-panel="effects">
-            <div class="settings-grid">
-              <label class="checkbox">
-                <input id="card-shadow-enabled" type="checkbox" />
-                Cień karty
-              </label>
-              <label class="checkbox">
-                <input id="card-rounded-enabled" type="checkbox" />
-                Zaokrąglenie karty
-              </label>
-              <label>
-                Promień karty (mm)
-                <input id="card-radius" type="number" min="0" max="10" step="0.5" />
-              </label>
-              <label>
-                Promień obrazków (px)
-                <input id="image-radius" type="number" min="0" max="30" step="1" />
-              </label>
-              <label class="checkbox">
-                <input id="show-cutlines" type="checkbox" />
-                Linie cięcia
-              </label>
+            <div class="settings-tab-content hidden" data-settings-panel="line">
+              <div class="settings-grid">
+                <label class="checkbox">
+                  <input id="card-line-enabled" type="checkbox" />
+                  Linia środkowa
+                </label>
+                <label class="field-line">
+                  Kolor linii
+                  <input id="card-line-color" type="color" />
+                </label>
+                <label class="field-line">
+                  Grubość (px)
+                  <input id="card-line-width" type="number" min="0" max="12" />
+                </label>
+                <label class="field-line">
+                  Styl linii
+                  <select id="card-line-style">
+                    <option value="solid">Ciągła</option>
+                    <option value="dashed">Przerywana</option>
+                    <option value="dotted">Kropkowana</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <div class="settings-tab-content hidden" data-settings-panel="effects">
+              <div class="settings-grid">
+                <label class="checkbox">
+                  <input id="card-shadow-enabled" type="checkbox" />
+                  Cień karty
+                </label>
+                <label class="checkbox">
+                  <input id="card-rounded-enabled" type="checkbox" />
+                  Zaokrąglenie karty
+                </label>
+                <label>
+                  Promień karty (mm)
+                  <input id="card-radius" type="number" min="0" max="10" step="0.5" />
+                </label>
+                <label>
+                  Promień obrazków (px)
+                  <input id="image-radius" type="number" min="0" max="30" step="1" />
+                </label>
+                <label class="checkbox">
+                  <input id="show-cutlines" type="checkbox" />
+                  Linie cięcia
+                </label>
+              </div>
             </div>
           </div>
         </section>

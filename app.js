@@ -268,6 +268,87 @@ const STYLE_PRESETS = [
       showCutLines: false,
     },
   },
+  {
+    id: "aurora",
+    name: "Aurora",
+    settings: {
+      textColorHex: "#0f172a",
+      textShadowEnabled: true,
+      cardBackgroundMode: "gradient",
+      cardBackgroundColorHex: "#ffffff",
+      cardBackgroundGradientType: "radial",
+      cardBackgroundGradientDirection: "diagonal",
+      cardBackgroundGradColor1Hex: "#bff7ff",
+      cardBackgroundGradColor2Hex: "#ffe3b3",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#0ea5e9",
+      cardBorderWidthPx: 2,
+      cardBorderStyle: "solid",
+      cardLineEnabled: true,
+      cardLineColorHex: "#0ea5e9",
+      cardLineWidthPx: 2,
+      cardLineStyle: "dashed",
+      cardShadowEnabled: true,
+      cardRoundedEnabled: true,
+      cardRadiusMm: 6,
+      imageRadiusPx: 16,
+      showCutLines: false,
+    },
+  },
+  {
+    id: "forest",
+    name: "Leśna mgła",
+    settings: {
+      textColorHex: "#1f2a1f",
+      textShadowEnabled: false,
+      cardBackgroundMode: "gradient",
+      cardBackgroundColorHex: "#ffffff",
+      cardBackgroundGradientType: "linear",
+      cardBackgroundGradientDirection: "vertical",
+      cardBackgroundGradColor1Hex: "#f0fff4",
+      cardBackgroundGradColor2Hex: "#b7e4c7",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#2f855a",
+      cardBorderWidthPx: 2,
+      cardBorderStyle: "solid",
+      cardLineEnabled: true,
+      cardLineColorHex: "#2f855a",
+      cardLineWidthPx: 2,
+      cardLineStyle: "solid",
+      cardShadowEnabled: false,
+      cardRoundedEnabled: true,
+      cardRadiusMm: 5,
+      imageRadiusPx: 14,
+      showCutLines: false,
+    },
+  },
+  {
+    id: "sunset",
+    name: "Zachód słońca",
+    settings: {
+      textColorHex: "#1f2937",
+      textShadowEnabled: true,
+      cardBackgroundMode: "gradient",
+      cardBackgroundColorHex: "#ffffff",
+      cardBackgroundGradientType: "linear",
+      cardBackgroundGradientDirection: "horizontal",
+      cardBackgroundGradColor1Hex: "#fde68a",
+      cardBackgroundGradColor2Hex: "#fca5a5",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#f97316",
+      cardBorderWidthPx: 3,
+      cardBorderStyle: "solid",
+      cardLineEnabled: true,
+      cardLineColorHex: "#f97316",
+      cardLineWidthPx: 3,
+      cardLineStyle: "dashed",
+      cardShadowEnabled: true,
+      cardRoundedEnabled: true,
+      cardRadiusMm: 7,
+      imageRadiusPx: 18,
+      showCutLines: false,
+    },
+  },
 ];
 
 function createDefaultProject() {
@@ -467,19 +548,22 @@ function setupTabs() {
 }
 
 function setupSettingsTabs() {
+  const setActiveTab = (tabId) => {
+    elements.settingsTabs.forEach((tab) =>
+      tab.classList.toggle("active", tab.dataset.settingsTab === tabId)
+    );
+    elements.settingsPanels.forEach((panel) =>
+      panel.classList.toggle("hidden", panel.dataset.settingsPanel !== tabId)
+    );
+  };
+
   elements.settingsTabs.forEach((button) => {
     button.addEventListener("click", () => {
-      elements.settingsTabs.forEach((tab) =>
-        tab.classList.toggle("active", tab.dataset.settingsTab === button.dataset.settingsTab)
-      );
-      elements.settingsPanels.forEach((panel) =>
-        panel.classList.toggle(
-          "hidden",
-          panel.dataset.settingsPanel !== button.dataset.settingsTab
-        )
-      );
+      setActiveTab(button.dataset.settingsTab);
     });
   });
+
+  setActiveTab("text");
 }
 
 function setupEditor() {
@@ -716,6 +800,8 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 body {
@@ -732,6 +818,8 @@ body {
   display: block;
   position: relative;
   page-break-after: always;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 @media screen {
@@ -781,6 +869,8 @@ body {
   ${bgCss}
   ${shadowCss}
   ${radiusCss}
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .card-line {
@@ -1087,9 +1177,11 @@ function renderPreview() {
   let fontPt = settings.fontSizePtFixed;
 
   if (state.project.mode === "text") {
-    const editor = tinymce.get("text-editor");
-    if (editor) {
-      state.project.textHtml = editor.getContent({ format: "html" });
+    if (state.editorReady) {
+      const editor = tinymce.get("text-editor");
+      if (editor) {
+        state.project.textHtml = editor.getContent({ format: "html" });
+      }
     }
     const items = normalizeHtmlToItems(state.project.textHtml);
     if (settings.fontSizePtMode === "auto") {
@@ -1444,16 +1536,16 @@ function setupStylePresets() {
     if (!preset) {
       return;
     }
-  state.project.settings = {
-    ...state.project.settings,
-    ...preset.settings,
-  };
-  state.project.settings.fontGoogleEnabled = false;
-  state.project.settings.fontGoogleName = "";
-  applySettingsToInputs();
-  syncConditionalFields();
-  setDirty(true);
-  schedulePreview();
+    state.project.settings = {
+      ...state.project.settings,
+      ...preset.settings,
+    };
+    state.project.settings.fontGoogleEnabled = false;
+    state.project.settings.fontGoogleName = "";
+    applySettingsToInputs();
+    syncConditionalFields();
+    setDirty(true);
+    schedulePreview();
   });
   elements.stylePreset.value = "custom";
 }
