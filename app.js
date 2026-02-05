@@ -12,6 +12,7 @@ const state = {
   editorReady: false,
   mmToPx: null,
   previewTimer: null,
+  loadedGoogleFonts: new Set(),
 };
 
 const elements = {
@@ -31,8 +32,13 @@ const elements = {
   textColor: document.getElementById("text-color"),
   textShadow: document.getElementById("text-shadow"),
   fontName: document.getElementById("font-name"),
+  fontGoogle: document.getElementById("font-google"),
   fontSizeMode: document.getElementById("font-size-mode"),
   fontSizeFixed: document.getElementById("font-size-fixed"),
+  textAlign: document.getElementById("text-align"),
+  textLineHeight: document.getElementById("text-line-height"),
+  fontStatus: document.getElementById("font-status"),
+  stylePreset: document.getElementById("style-preset"),
   cardBgMode: document.getElementById("card-bg-mode"),
   cardBgColor: document.getElementById("card-bg-color"),
   cardBgGradientType: document.getElementById("card-bg-gradient-type"),
@@ -49,6 +55,8 @@ const elements = {
   cardLineStyle: document.getElementById("card-line-style"),
   cardShadowEnabled: document.getElementById("card-shadow-enabled"),
   cardRoundedEnabled: document.getElementById("card-rounded-enabled"),
+  cardRadius: document.getElementById("card-radius"),
+  imageRadius: document.getElementById("image-radius"),
   showCutLines: document.getElementById("show-cutlines"),
 };
 
@@ -57,8 +65,11 @@ function createDefaultSettings() {
     textColorHex: "#000000",
     textShadowEnabled: false,
     fontName: "Times New Roman",
+    fontGoogleName: "",
     fontSizePtMode: "auto",
     fontSizePtFixed: 28,
+    textAlign: "center",
+    textLineHeight: 1.1,
     cardBackgroundMode: "white",
     cardBackgroundColorHex: "#ffffff",
     cardBackgroundGradientType: "linear",
@@ -75,9 +86,176 @@ function createDefaultSettings() {
     cardLineStyle: "solid",
     cardShadowEnabled: false,
     cardRoundedEnabled: true,
+    cardRadiusMm: 4,
+    imageRadiusPx: 12,
     showCutLines: false,
   };
 }
+
+const STYLE_PRESETS = [
+  {
+    id: "classic",
+    name: "Klasyczny",
+    settings: {
+      textColorHex: "#000000",
+      textShadowEnabled: false,
+      cardBackgroundMode: "white",
+      cardBackgroundColorHex: "#ffffff",
+      cardBackgroundGradientType: "linear",
+      cardBackgroundGradientDirection: "vertical",
+      cardBackgroundGradColor1Hex: "#ffffff",
+      cardBackgroundGradColor2Hex: "#e0ecff",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#3366cc",
+      cardBorderWidthPx: 2,
+      cardBorderStyle: "solid",
+      cardLineEnabled: true,
+      cardLineColorHex: "#3366cc",
+      cardLineWidthPx: 2,
+      cardLineStyle: "solid",
+      cardShadowEnabled: false,
+      cardRoundedEnabled: true,
+      cardRadiusMm: 4,
+      imageRadiusPx: 12,
+      showCutLines: false,
+    },
+  },
+  {
+    id: "soft",
+    name: "Miękki gradient",
+    settings: {
+      textColorHex: "#003366",
+      textShadowEnabled: false,
+      cardBackgroundMode: "gradient",
+      cardBackgroundColorHex: "#ffffff",
+      cardBackgroundGradientType: "linear",
+      cardBackgroundGradientDirection: "vertical",
+      cardBackgroundGradColor1Hex: "#ffffff",
+      cardBackgroundGradColor2Hex: "#cce0ff",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#6699cc",
+      cardBorderWidthPx: 2,
+      cardBorderStyle: "solid",
+      cardLineEnabled: true,
+      cardLineColorHex: "#6699cc",
+      cardLineWidthPx: 2,
+      cardLineStyle: "solid",
+      cardShadowEnabled: true,
+      cardRoundedEnabled: true,
+      cardRadiusMm: 5,
+      imageRadiusPx: 14,
+      showCutLines: false,
+    },
+  },
+  {
+    id: "outline",
+    name: "Obwódka",
+    settings: {
+      textColorHex: "#111827",
+      textShadowEnabled: false,
+      cardBackgroundMode: "color",
+      cardBackgroundColorHex: "#ffffff",
+      cardBackgroundGradientType: "linear",
+      cardBackgroundGradientDirection: "horizontal",
+      cardBackgroundGradColor1Hex: "#ffffff",
+      cardBackgroundGradColor2Hex: "#ffffff",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#111827",
+      cardBorderWidthPx: 2,
+      cardBorderStyle: "dashed",
+      cardLineEnabled: true,
+      cardLineColorHex: "#111827",
+      cardLineWidthPx: 2,
+      cardLineStyle: "dotted",
+      cardShadowEnabled: false,
+      cardRoundedEnabled: false,
+      cardRadiusMm: 0,
+      imageRadiusPx: 6,
+      showCutLines: true,
+    },
+  },
+  {
+    id: "pastel",
+    name: "Pastelowy",
+    settings: {
+      textColorHex: "#334455",
+      textShadowEnabled: false,
+      cardBackgroundMode: "gradient",
+      cardBackgroundColorHex: "#ffffff",
+      cardBackgroundGradientType: "radial",
+      cardBackgroundGradientDirection: "diagonal",
+      cardBackgroundGradColor1Hex: "#fff5ff",
+      cardBackgroundGradColor2Hex: "#e0f7ff",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#ff9999",
+      cardBorderWidthPx: 2,
+      cardBorderStyle: "solid",
+      cardLineEnabled: true,
+      cardLineColorHex: "#ff9999",
+      cardLineWidthPx: 2,
+      cardLineStyle: "solid",
+      cardShadowEnabled: true,
+      cardRoundedEnabled: true,
+      cardRadiusMm: 6,
+      imageRadiusPx: 16,
+      showCutLines: false,
+    },
+  },
+  {
+    id: "retro",
+    name: "Retro 80s",
+    settings: {
+      textColorHex: "#1f1330",
+      textShadowEnabled: true,
+      cardBackgroundMode: "gradient",
+      cardBackgroundColorHex: "#ffffff",
+      cardBackgroundGradientType: "linear",
+      cardBackgroundGradientDirection: "diagonal",
+      cardBackgroundGradColor1Hex: "#ffe29a",
+      cardBackgroundGradColor2Hex: "#ff92b5",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#6a0dad",
+      cardBorderWidthPx: 3,
+      cardBorderStyle: "solid",
+      cardLineEnabled: true,
+      cardLineColorHex: "#6a0dad",
+      cardLineWidthPx: 3,
+      cardLineStyle: "solid",
+      cardShadowEnabled: true,
+      cardRoundedEnabled: true,
+      cardRadiusMm: 7,
+      imageRadiusPx: 18,
+      showCutLines: false,
+    },
+  },
+  {
+    id: "midnight",
+    name: "Midnight",
+    settings: {
+      textColorHex: "#f8fafc",
+      textShadowEnabled: true,
+      cardBackgroundMode: "color",
+      cardBackgroundColorHex: "#0f172a",
+      cardBackgroundGradientType: "linear",
+      cardBackgroundGradientDirection: "vertical",
+      cardBackgroundGradColor1Hex: "#0f172a",
+      cardBackgroundGradColor2Hex: "#1e293b",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#38bdf8",
+      cardBorderWidthPx: 2,
+      cardBorderStyle: "solid",
+      cardLineEnabled: true,
+      cardLineColorHex: "#38bdf8",
+      cardLineWidthPx: 2,
+      cardLineStyle: "dashed",
+      cardShadowEnabled: false,
+      cardRoundedEnabled: true,
+      cardRadiusMm: 4,
+      imageRadiusPx: 12,
+      showCutLines: false,
+    },
+  },
+];
 
 function createDefaultProject() {
   return {
@@ -92,6 +270,10 @@ function createDefaultProject() {
 function setDirty(isDirty) {
   state.dirty = isDirty;
   elements.dirtyIndicator.textContent = isDirty ? "● Zmieniono" : "";
+}
+
+function clamp(value, min, max) {
+  return Math.min(Math.max(value, min), max);
 }
 
 function schedulePreview() {
@@ -117,8 +299,11 @@ function updateSettingsFromInputs() {
   settings.textColorHex = elements.textColor.value;
   settings.textShadowEnabled = elements.textShadow.checked;
   settings.fontName = elements.fontName.value.trim() || "Times New Roman";
+  settings.fontGoogleName = elements.fontGoogle.value.trim();
   settings.fontSizePtMode = elements.fontSizeMode.value;
-  settings.fontSizePtFixed = Number(elements.fontSizeFixed.value) || 28;
+  settings.fontSizePtFixed = clamp(Number(elements.fontSizeFixed.value) || 28, 8, 72);
+  settings.textAlign = elements.textAlign.value;
+  settings.textLineHeight = clamp(Number(elements.textLineHeight.value) || 1.1, 1, 1.6);
   settings.cardBackgroundMode = elements.cardBgMode.value;
   settings.cardBackgroundColorHex = elements.cardBgColor.value;
   settings.cardBackgroundGradientType = elements.cardBgGradientType.value;
@@ -127,14 +312,16 @@ function updateSettingsFromInputs() {
   settings.cardBackgroundGradColor2Hex = elements.cardBgGrad2.value;
   settings.cardBorderEnabled = elements.cardBorderEnabled.checked;
   settings.cardBorderColorHex = elements.cardBorderColor.value;
-  settings.cardBorderWidthPx = Number(elements.cardBorderWidth.value) || 0;
+  settings.cardBorderWidthPx = clamp(Number(elements.cardBorderWidth.value) || 0, 0, 12);
   settings.cardBorderStyle = elements.cardBorderStyle.value;
   settings.cardLineEnabled = elements.cardLineEnabled.checked;
   settings.cardLineColorHex = elements.cardLineColor.value;
-  settings.cardLineWidthPx = Number(elements.cardLineWidth.value) || 0;
+  settings.cardLineWidthPx = clamp(Number(elements.cardLineWidth.value) || 0, 0, 12);
   settings.cardLineStyle = elements.cardLineStyle.value;
   settings.cardShadowEnabled = elements.cardShadowEnabled.checked;
   settings.cardRoundedEnabled = elements.cardRoundedEnabled.checked;
+  settings.cardRadiusMm = clamp(Number(elements.cardRadius.value) || 0, 0, 10);
+  settings.imageRadiusPx = clamp(Number(elements.imageRadius.value) || 0, 0, 30);
   settings.showCutLines = elements.showCutLines.checked;
 }
 
@@ -143,8 +330,11 @@ function applySettingsToInputs() {
   elements.textColor.value = settings.textColorHex;
   elements.textShadow.checked = settings.textShadowEnabled;
   elements.fontName.value = settings.fontName;
+  elements.fontGoogle.value = settings.fontGoogleName || "";
   elements.fontSizeMode.value = settings.fontSizePtMode;
   elements.fontSizeFixed.value = settings.fontSizePtFixed;
+  elements.textAlign.value = settings.textAlign;
+  elements.textLineHeight.value = settings.textLineHeight;
   elements.cardBgMode.value = settings.cardBackgroundMode;
   elements.cardBgColor.value = settings.cardBackgroundColorHex;
   elements.cardBgGradientType.value = settings.cardBackgroundGradientType;
@@ -161,12 +351,16 @@ function applySettingsToInputs() {
   elements.cardLineStyle.value = settings.cardLineStyle;
   elements.cardShadowEnabled.checked = settings.cardShadowEnabled;
   elements.cardRoundedEnabled.checked = settings.cardRoundedEnabled;
+  elements.cardRadius.value = settings.cardRadiusMm;
+  elements.imageRadius.value = settings.imageRadiusPx;
   elements.showCutLines.checked = settings.showCutLines;
+  updateFontSizeModeUI();
+  updateFontStatus("");
 }
 
 function bindSettingsEvents() {
   const inputs = document.querySelectorAll(
-    "#text-color, #text-shadow, #font-name, #font-size-mode, #font-size-fixed, #card-bg-mode, #card-bg-color, #card-bg-gradient-type, #card-bg-gradient-direction, #card-bg-grad-1, #card-bg-grad-2, #card-border-enabled, #card-border-color, #card-border-width, #card-border-style, #card-line-enabled, #card-line-color, #card-line-width, #card-line-style, #card-shadow-enabled, #card-rounded-enabled, #show-cutlines"
+    "#text-color, #text-shadow, #font-name, #font-google, #font-size-mode, #font-size-fixed, #text-align, #text-line-height, #card-bg-mode, #card-bg-color, #card-bg-gradient-type, #card-bg-gradient-direction, #card-bg-grad-1, #card-bg-grad-2, #card-border-enabled, #card-border-color, #card-border-width, #card-border-style, #card-line-enabled, #card-line-color, #card-line-width, #card-line-style, #card-shadow-enabled, #card-rounded-enabled, #card-radius, #image-radius, #show-cutlines"
   );
 
   inputs.forEach((input) => {
@@ -176,6 +370,45 @@ function bindSettingsEvents() {
       schedulePreview();
     });
   });
+}
+
+function updateFontSizeModeUI() {
+  const isAuto = elements.fontSizeMode.value === "auto";
+  elements.fontSizeFixed.disabled = isAuto;
+}
+
+function updateFontStatus(message) {
+  elements.fontStatus.textContent = message;
+}
+
+async function loadGoogleFont(name) {
+  if (!name) {
+    return false;
+  }
+  if (state.loadedGoogleFonts.has(name)) {
+    return true;
+  }
+  const urlName = name.trim().replace(/\s+/g, "+");
+  const href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(urlName)}:wght@400;700&display=swap`;
+  const response = await fetch(href);
+  if (!response.ok) {
+    return false;
+  }
+  const cssText = await response.text();
+  if (!cssText.includes("@font-face")) {
+    return false;
+  }
+  let link = document.getElementById("google-font-link");
+  if (!link) {
+    link = document.createElement("link");
+    link.id = "google-font-link";
+    link.rel = "stylesheet";
+    document.head.appendChild(link);
+  }
+  link.href = href;
+  await document.fonts.load(`1em "${name}"`);
+  state.loadedGoogleFonts.add(name);
+  return true;
 }
 
 function setupTabs() {
@@ -194,7 +427,6 @@ function setupEditor() {
     plugins: "lists",
     toolbar: "bold italic underline | bullist numlist | removeformat",
     newline_behavior: "linebreak",
-    forced_root_block: false,
     setup: (editor) => {
       editor.on("init", () => {
         editor.setContent(state.project.textHtml || "");
@@ -217,7 +449,9 @@ function normalizeHtmlToItems(html) {
   let normalized = html
     .replace(/\n/g, "")
     .replace(/<p[^>]*>/gi, "")
-    .replace(/<\/p>/gi, "<br>");
+    .replace(/<\/p>/gi, "<br>")
+    .replace(/<div[^>]*>/gi, "")
+    .replace(/<\/div>/gi, "<br>");
 
   const parts = normalized.split(/<br\s*\/?\s*>/i);
   return parts
@@ -252,23 +486,24 @@ function computeAutoFontPt(itemsHtml, settings) {
     state.mmToPx = computeMmToPx();
   }
 
-  const width = CARD_INNER_WIDTH_MM * state.mmToPx;
-  const height = CARD_TEXT_HEIGHT_MM * state.mmToPx;
+  const width = CARD_INNER_WIDTH_MM * state.mmToPx * 0.95;
+  const height = CARD_TEXT_HEIGHT_MM * state.mmToPx * 0.9;
 
   measure.style.width = `${width}px`;
   measure.style.height = `${height}px`;
   measure.style.padding = "0";
   measure.style.fontFamily = settings.fontName;
   measure.style.fontSize = "28pt";
-  measure.style.lineHeight = "1.1";
+  measure.style.lineHeight = settings.textLineHeight.toString();
   measure.style.wordWrap = "break-word";
   measure.style.overflow = "hidden";
   measure.style.display = "block";
+  measure.style.textAlign = settings.textAlign;
 
   const fits = (fontPt) => {
     measure.style.fontSize = `${fontPt}pt`;
     for (const item of itemsHtml) {
-      measure.innerHTML = `<div class="measure-header">Ja mam</div><div class="measure-word">${item}</div>`;
+      measure.innerHTML = `<div class="measure-header" style="margin-bottom:2mm;">Ja mam</div><div class="measure-word">${item}</div>`;
       if (measure.scrollWidth > measure.clientWidth || measure.scrollHeight > measure.clientHeight) {
         return false;
       }
@@ -294,6 +529,10 @@ function computeAutoFontPt(itemsHtml, settings) {
 }
 
 function buildCss(settings, fontPt) {
+  const hasGoogleFont = settings.fontGoogleName && state.loadedGoogleFonts.has(settings.fontGoogleName);
+  const fontFamily = hasGoogleFont
+    ? `"${settings.fontGoogleName}", "${settings.fontName}", serif`
+    : `"${settings.fontName}", serif`;
   const textShadowCss = settings.textShadowEnabled
     ? "text-shadow: 0 0.4mm 0.8mm rgba(0,0,0,0.35);"
     : "text-shadow: none;";
@@ -332,8 +571,9 @@ function buildCss(settings, fontPt) {
     ? "box-shadow: 0 2mm 4mm rgba(0,0,0,0.18);"
     : "box-shadow: none;";
 
+  const radiusValue = settings.cardRoundedEnabled ? settings.cardRadiusMm : 0;
   const radiusCss = settings.cardRoundedEnabled
-    ? "border-radius: 4mm; overflow: hidden;"
+    ? `border-radius: ${radiusValue}mm; overflow: hidden;`
     : "border-radius: 0; overflow: visible;";
 
   let css = `
@@ -350,7 +590,7 @@ html, body {
 }
 
 body {
-  font-family: "${settings.fontName}", serif;
+  font-family: ${fontFamily};
   background: #ffffff;
 }
 
@@ -458,21 +698,23 @@ body {
 .text-card .header,
 .text-card .word {
   font-size: ${fontPt}pt;
-  line-height: 1.1;
+  line-height: ${settings.textLineHeight};
   word-wrap: break-word;
   color: ${settings.textColorHex};
+  text-align: ${settings.textAlign};
   ${textShadowCss}
 }
 
 .text-card .header {
   margin-bottom: 2mm;
+  text-align: ${settings.textAlign};
 }
 
 .image-card .header {
   font-size: 28pt;
   margin-bottom: 2mm;
   color: ${settings.textColorHex};
-  text-align: center;
+  text-align: ${settings.textAlign};
   display: block;
   width: 100%;
   ${textShadowCss}
@@ -499,16 +741,15 @@ body {
   box-sizing: border-box;
   padding: 1mm;
   overflow: hidden;
-  border-radius: 12px;
+  border-radius: ${settings.imageRadiusPx}px;
 }
 
 .image-card img {
   display: inline-block;
-  border-radius: 12px;
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
+  border-radius: ${settings.imageRadiusPx}px;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 `;
 
@@ -726,6 +967,10 @@ function renderImageList() {
     const item = document.createElement("div");
     item.className = "image-item";
 
+    const preview = document.createElement("img");
+    preview.src = image.dataUrl;
+    preview.alt = image.name;
+
     const name = document.createElement("span");
     name.textContent = image.name;
 
@@ -750,7 +995,7 @@ function renderImageList() {
     remove.addEventListener("click", () => removeImage(index));
 
     actions.append(up, down, remove);
-    item.append(name, actions);
+    item.append(preview, name, actions);
     elements.imageList.appendChild(item);
   });
 }
@@ -812,6 +1057,7 @@ function handleNewProject() {
   }
   state.project = createDefaultProject();
   applySettingsToInputs();
+  elements.stylePreset.value = "custom";
   renderImageList();
   if (state.editorReady) {
     const editor = tinymce.get("text-editor");
@@ -859,6 +1105,7 @@ function handleLoadProject(file) {
         settings: { ...createDefaultSettings(), ...data.settings },
       };
       applySettingsToInputs();
+      elements.stylePreset.value = "custom";
       renderImageList();
       if (state.editorReady) {
         const editor = tinymce.get("text-editor");
@@ -868,6 +1115,16 @@ function handleLoadProject(file) {
       }
       switchTab(state.project.mode);
       setDirty(false);
+      if (state.project.settings.fontGoogleName) {
+        loadGoogleFont(state.project.settings.fontGoogleName).then((loaded) => {
+          updateFontStatus(
+            loaded
+              ? `Wczytano Google Font: ${state.project.settings.fontGoogleName}`
+              : `Nie znaleziono Google Font: ${state.project.settings.fontGoogleName}`
+          );
+          schedulePreview();
+        });
+      }
       schedulePreview();
     } catch (error) {
       window.alert(`Nie udało się wczytać projektu: ${error.message}`);
@@ -941,14 +1198,84 @@ function setupImageControls() {
   });
 }
 
+function setupFontControls() {
+  elements.fontSizeMode.addEventListener("change", () => {
+    updateFontSizeModeUI();
+  });
+
+  elements.fontName.addEventListener("change", () => {
+    updateFontStatus("Używana czcionka systemowa.");
+    schedulePreview();
+  });
+
+  elements.fontGoogle.addEventListener("change", async () => {
+    updateSettingsFromInputs();
+    if (!state.project.settings.fontGoogleName) {
+      updateFontStatus("Używana czcionka systemowa.");
+      schedulePreview();
+      return;
+    }
+    updateFontStatus("Sprawdzam Google Fonts...");
+    const loaded = await loadGoogleFont(state.project.settings.fontGoogleName);
+    updateFontStatus(
+      loaded
+        ? `Wczytano Google Font: ${state.project.settings.fontGoogleName}`
+        : `Nie znaleziono Google Font: ${state.project.settings.fontGoogleName}`
+    );
+    schedulePreview();
+  });
+}
+
+function setupStylePresets() {
+  elements.stylePreset.innerHTML = "";
+  const customOption = document.createElement("option");
+  customOption.value = "custom";
+  customOption.textContent = "Własny";
+  elements.stylePreset.appendChild(customOption);
+  STYLE_PRESETS.forEach((preset) => {
+    const option = document.createElement("option");
+    option.value = preset.id;
+    option.textContent = preset.name;
+    elements.stylePreset.appendChild(option);
+  });
+  elements.stylePreset.addEventListener("change", () => {
+    const preset = STYLE_PRESETS.find((item) => item.id === elements.stylePreset.value);
+    if (!preset) {
+      return;
+    }
+    state.project.settings = {
+      ...state.project.settings,
+      ...preset.settings,
+    };
+    applySettingsToInputs();
+    setDirty(true);
+    schedulePreview();
+  });
+  elements.stylePreset.value = "custom";
+}
+
 function init() {
   applySettingsToInputs();
   bindSettingsEvents();
   setupTabs();
   setupEditor();
   setupImageControls();
+  setupFontControls();
+  setupStylePresets();
   setupProjectControls();
   renderImageList();
+  if (state.project.settings.fontGoogleName) {
+    loadGoogleFont(state.project.settings.fontGoogleName).then((loaded) => {
+      updateFontStatus(
+        loaded
+          ? `Wczytano Google Font: ${state.project.settings.fontGoogleName}`
+          : `Nie znaleziono Google Font: ${state.project.settings.fontGoogleName}`
+      );
+      schedulePreview();
+    });
+  } else {
+    updateFontStatus("Używana czcionka systemowa.");
+  }
   schedulePreview();
 }
 
