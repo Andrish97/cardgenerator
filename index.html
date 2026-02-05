@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generator kart Ja mam / Kto ma</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script
+    src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js"
+    referrerpolicy="origin"
+  ></script>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar__left">
+        <button id="new-project" type="button">Nowy</button>
+        <button id="load-project" type="button">Wczytaj</button>
+        <button id="save-project" type="button">Zapisz</button>
+        <button id="print-project" type="button">Drukuj / PDF</button>
+        <span id="dirty-indicator" class="dirty-indicator" aria-live="polite"></span>
+      </div>
+      <div class="topbar__right">
+        <span class="hint">PDF: użyj opcji „Zapisz jako PDF” w oknie drukowania.</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="panel controls">
+        <div class="tabs">
+          <button class="tab active" data-tab="text" type="button">Tekst</button>
+          <button class="tab" data-tab="image" type="button">Obrazki</button>
+        </div>
+
+        <div class="tab-content" id="tab-text">
+          <textarea id="text-editor"></textarea>
+        </div>
+
+        <div class="tab-content hidden" id="tab-image">
+          <div class="image-controls">
+            <input id="image-input" type="file" accept="image/*" multiple />
+            <div class="image-list" id="image-list"></div>
+          </div>
+        </div>
+
+        <div class="settings">
+          <h2>Ustawienia</h2>
+          <div class="settings-grid">
+            <label>
+              Kolor tekstu
+              <input id="text-color" type="color" />
+            </label>
+            <label class="checkbox">
+              <input id="text-shadow" type="checkbox" />
+              Cień tekstu
+            </label>
+            <label>
+              Czcionka
+              <input id="font-name" type="text" />
+            </label>
+            <label>
+              Rozmiar czcionki
+              <select id="font-size-mode">
+                <option value="auto">Auto</option>
+                <option value="fixed">Stały</option>
+              </select>
+            </label>
+            <label>
+              Rozmiar (pt)
+              <input id="font-size-fixed" type="number" min="8" max="72" />
+            </label>
+          </div>
+
+          <h3>Tło</h3>
+          <div class="settings-grid">
+            <label>
+              Tryb tła
+              <select id="card-bg-mode">
+                <option value="white">Białe</option>
+                <option value="color">Kolor</option>
+                <option value="gradient">Gradient</option>
+              </select>
+            </label>
+            <label>
+              Kolor tła
+              <input id="card-bg-color" type="color" />
+            </label>
+            <label>
+              Typ gradientu
+              <select id="card-bg-gradient-type">
+                <option value="linear">Liniowy</option>
+                <option value="radial">Radialny</option>
+              </select>
+            </label>
+            <label>
+              Kierunek gradientu
+              <select id="card-bg-gradient-direction">
+                <option value="vertical">Pionowy</option>
+                <option value="horizontal">Poziomy</option>
+                <option value="diagonal">Ukośny</option>
+              </select>
+            </label>
+            <label>
+              Kolor gradientu 1
+              <input id="card-bg-grad-1" type="color" />
+            </label>
+            <label>
+              Kolor gradientu 2
+              <input id="card-bg-grad-2" type="color" />
+            </label>
+          </div>
+
+          <h3>Obramowanie</h3>
+          <div class="settings-grid">
+            <label class="checkbox">
+              <input id="card-border-enabled" type="checkbox" />
+              Obramowanie
+            </label>
+            <label>
+              Kolor obramowania
+              <input id="card-border-color" type="color" />
+            </label>
+            <label>
+              Grubość (px)
+              <input id="card-border-width" type="number" min="0" max="10" />
+            </label>
+            <label>
+              Styl obramowania
+              <select id="card-border-style">
+                <option value="solid">Ciągła</option>
+                <option value="dashed">Przerywana</option>
+                <option value="dotted">Kropkowana</option>
+              </select>
+            </label>
+          </div>
+
+          <h3>Linia środkowa</h3>
+          <div class="settings-grid">
+            <label class="checkbox">
+              <input id="card-line-enabled" type="checkbox" />
+              Linia środkowa
+            </label>
+            <label>
+              Kolor linii
+              <input id="card-line-color" type="color" />
+            </label>
+            <label>
+              Grubość (px)
+              <input id="card-line-width" type="number" min="0" max="10" />
+            </label>
+            <label>
+              Styl linii
+              <select id="card-line-style">
+                <option value="solid">Ciągła</option>
+                <option value="dashed">Przerywana</option>
+                <option value="dotted">Kropkowana</option>
+              </select>
+            </label>
+          </div>
+
+          <h3>Efekty i druk</h3>
+          <div class="settings-grid">
+            <label class="checkbox">
+              <input id="card-shadow-enabled" type="checkbox" />
+              Cień karty
+            </label>
+            <label class="checkbox">
+              <input id="card-rounded-enabled" type="checkbox" />
+              Zaokrąglenie
+            </label>
+            <label class="checkbox">
+              <input id="show-cutlines" type="checkbox" />
+              Linie cięcia
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel preview">
+        <h2>Podgląd</h2>
+        <iframe id="preview-frame" title="Podgląd kart" sandbox="allow-same-origin"></iframe>
+      </section>
+    </main>
+  </div>
+
+  <div id="measure-box" class="measure-box" aria-hidden="true"></div>
+
+  <input id="project-input" type="file" accept="application/json" hidden />
+
+  <script src="app.js"></script>
+</body>
+</html>
