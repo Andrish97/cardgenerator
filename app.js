@@ -70,6 +70,8 @@ const elements = {
   previewScaleValue: document.getElementById("preview-scale-value"),
   previewFit: document.getElementById("preview-fit"),
   previewViewport: document.querySelector(".preview-viewport"),
+  previewPanel: document.querySelector(".preview"),
+  mobilePreviewToggle: document.getElementById("mobile-preview-toggle"),
 };
 
 function createDefaultSettings() {
@@ -488,7 +490,7 @@ function setupEditor() {
     branding: false,
     height: 260,
     plugins: "autolink",
-    toolbar: "bold italic underline | alignleft aligncenter alignright | removeformat",
+    toolbar: "bold italic underline | removeformat",
     newline_behavior: "linebreak",
     forced_root_block: "div",
     forced_root_block_attrs: {},
@@ -525,8 +527,21 @@ function normalizeHtmlToItems(html) {
     .filter((part) => stripHtml(part).replace(/&nbsp;/g, " ").trim().length > 0);
 }
 
+function appendQuestionToItem(html) {
+  if (!html) {
+    return html;
+  }
+  if (html.includes("</span>")) {
+    return html.replace(
+      /<\/span>(?!.*<\/span>)/,
+      '&nbsp;<span class="question">?</span></span>'
+    );
+  }
+  return `${html}&nbsp;<span class="question">?</span>`;
+}
+
 function prepareItemsForFit(itemsHtml) {
-  return itemsHtml.map((item) => `${item}&nbsp;<span class="question">?</span>`);
+  return itemsHtml.map((item) => appendQuestionToItem(item));
 }
 
 function stripHtml(html) {
@@ -566,7 +581,9 @@ function computeAutoFontPt(itemsHtml, settings) {
   measure.style.fontFamily = settings.fontName;
   measure.style.fontSize = "28pt";
   measure.style.lineHeight = "1.1";
-  measure.style.wordWrap = "break-word";
+  measure.style.wordBreak = "normal";
+  measure.style.overflowWrap = "normal";
+  measure.style.wordWrap = "normal";
   measure.style.overflow = "hidden";
   measure.style.display = "block";
   measure.style.textAlign = "center";
@@ -621,7 +638,9 @@ function checkTextFits(itemsHtml, settings, fontPt) {
   measure.style.fontFamily = fontFamily;
   measure.style.fontSize = `${fontPt}pt`;
   measure.style.lineHeight = "1.1";
-  measure.style.wordWrap = "break-word";
+  measure.style.wordBreak = "normal";
+  measure.style.overflowWrap = "normal";
+  measure.style.wordWrap = "normal";
   measure.style.overflow = "hidden";
   measure.style.display = "block";
   measure.style.textAlign = "center";
@@ -811,7 +830,9 @@ body {
 .text-card .word {
   font-size: ${fontPt}pt;
   line-height: 1.1;
-  word-wrap: break-word;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: manual;
   color: ${settings.textColorHex};
   text-align: center;
   ${textShadowCss}
@@ -829,8 +850,8 @@ body {
 .text-card .word {
   max-height: 100%;
   overflow: hidden;
-  word-break: break-word;
-  overflow-wrap: anywhere;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 .text-card .question {
@@ -1023,7 +1044,7 @@ function buildTextPages(itemsHtml, settings) {
         }
         const top = itemsHtml[idx];
         const bottomIndex = (idx + 1) % n;
-        const bottom = `${itemsHtml[bottomIndex]}&nbsp;<span class="question">?</span>`;
+        const bottom = appendQuestionToItem(itemsHtml[bottomIndex]);
         cells.push(buildTextCard(top, bottom));
       }
       rows.push(`<tr>${cells.join("")}</tr>`);
@@ -1445,6 +1466,11 @@ function setupPreviewControls() {
   elements.previewFit.addEventListener("click", () => {
     fitPreviewToWidth();
   });
+  if (elements.mobilePreviewToggle && elements.previewPanel) {
+    elements.mobilePreviewToggle.addEventListener("click", () => {
+      elements.previewPanel.classList.toggle("is-open");
+    });
+  }
   window.addEventListener("resize", () => {
     fitPreviewToWidth();
   });

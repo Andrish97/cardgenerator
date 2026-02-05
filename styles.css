@@ -79,6 +79,7 @@ body {
   flex-direction: column;
   gap: 16px;
   min-height: 0;
+  overflow: hidden;
 }
 
 .panel {
@@ -93,9 +94,19 @@ body {
 
 .controls,
 .settings {
-  flex: 1;
   min-height: 0;
   overflow: auto;
+}
+
+.controls {
+  flex: 0 0 auto;
+  max-height: clamp(260px, 45vh, 520px);
+  min-height: 200px;
+}
+
+.settings {
+  flex: 1;
+  min-height: 240px;
 }
 
 .panel-header {
@@ -135,6 +146,10 @@ body {
 
 .tab-content {
   min-height: 180px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
 }
 
 .tab-content.hidden {
@@ -145,12 +160,16 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex: 1;
+  min-height: 0;
 }
 
 .image-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overflow: auto;
+  min-height: 0;
 }
 
 .image-item {
@@ -190,6 +209,16 @@ body {
 
 .settings h2 {
   margin: 8px 0 4px;
+}
+
+.settings-box {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f9fafb;
 }
 
 .settings-grid {
@@ -271,7 +300,8 @@ body {
 }
 
 .tox .tox-editor-container {
-  min-height: 260px;
+  min-height: 200px;
+  flex: 1;
 }
 
 .preview-header {
@@ -287,16 +317,16 @@ body {
   gap: 8px;
 }
 
-.preview-controls input[type="range"] {
-  width: 140px;
-}
-
 .preview-controls button {
   border: 1px solid #d1d5db;
   background: #f9fafb;
   padding: 6px 10px;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.preview-controls input[type="range"] {
+  width: 140px;
 }
 
 .preview-viewport {
@@ -307,6 +337,16 @@ body {
   background: #f3f4f6;
   padding: 12px;
   min-height: 0;
+}
+
+.mobile-preview-toggle {
+  display: none;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
 }
 
 .preview iframe {
@@ -330,7 +370,57 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .controls {
-    max-height: none;
+  body {
+    overflow: auto;
+  }
+
+  .app {
+    min-height: auto;
+  }
+
+  .controls-column {
+    overflow: visible;
+  }
+
+  .controls,
+  .settings {
+    min-height: 0;
+  }
+
+  .preview {
+    display: none;
+  }
+
+  .preview.is-open {
+    display: flex;
+  }
+
+  .mobile-preview-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .preview-controls {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 720px) {
+  .layout {
+    padding: 12px;
+  }
+
+  .settings-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panel {
+    padding: 12px;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
