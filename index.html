@@ -171,8 +171,8 @@
                   <input id="card-border-color" type="color" />
                 </label>
                 <label class="field-border">
-                  Grubość (px)
-                  <input id="card-border-width" type="number" min="0" max="12" />
+                  Grubość (mm)
+                  <input id="card-border-width" type="number" min="0" max="5" step="0.1" />
                 </label>
                 <label class="field-border">
                   Styl obramowania
@@ -196,8 +196,8 @@
                   <input id="card-line-color" type="color" />
                 </label>
                 <label class="field-line">
-                  Grubość (px)
-                  <input id="card-line-width" type="number" min="0" max="12" />
+                  Grubość (mm)
+                  <input id="card-line-width" type="number" min="0" max="5" step="0.1" />
                 </label>
                 <label class="field-line">
                   Styl linii
@@ -205,6 +205,11 @@
                     <option value="solid">Ciągła</option>
                     <option value="dashed">Przerywana</option>
                     <option value="dotted">Kropkowana</option>
+                    <option value="double">Podwójna</option>
+                    <option value="groove">Wgłębiona</option>
+                    <option value="ridge">Wypukła</option>
+                    <option value="inset">Wklęsła</option>
+                    <option value="outset">Wypukła 2</option>
                   </select>
                 </label>
               </div>
@@ -225,8 +230,8 @@
                   <input id="card-radius" type="number" min="0" max="10" step="0.5" />
                 </label>
                 <label>
-                  Promień obrazków (px)
-                  <input id="image-radius" type="number" min="0" max="30" step="1" />
+                  Promień obrazków (mm)
+                  <input id="image-radius" type="number" min="0" max="10" step="0.5" />
                 </label>
                 <label class="checkbox">
                   <input id="show-cutlines" type="checkbox" />
