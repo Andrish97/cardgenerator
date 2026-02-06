@@ -1157,10 +1157,15 @@ body {
     background: transparent;
     user-select: none;
     -webkit-user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6mm;
+    padding: 6mm 0;
   }
 
   .page {
-    margin: 4mm auto;
+    margin: 0;
     background: transparent;
     box-shadow: none;
   }
