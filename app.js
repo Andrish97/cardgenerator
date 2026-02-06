@@ -6,6 +6,8 @@ const FONT_PT_MAX = 60;
 const CARD_INNER_WIDTH_MM = 64;
 const CARD_TEXT_HEIGHT_MM = 44;
 const THEME_STORAGE_KEY = "cardgenerator-theme";
+const PREVIEW_SCALE_MIN = 50;
+const PREVIEW_SCALE_MAX = 180;
 
 const state = {
   project: createDefaultProject(),
@@ -1558,7 +1560,8 @@ function renderPreview() {
 }
 
 function applyPreviewScale(scaleValue) {
-  const scale = clamp(Number(scaleValue) || 100, 60, 140) / 100;
+  const scale =
+    clamp(Number(scaleValue) || 100, PREVIEW_SCALE_MIN, PREVIEW_SCALE_MAX) / 100;
   elements.previewScaleValue.textContent = `${Math.round(scale * 100)}%`;
   elements.previewFrame.style.transform = `scale(${scale})`;
 }
@@ -1572,7 +1575,11 @@ function fitPreviewToWidth() {
   const paddingX =
     parseFloat(viewportStyles.paddingLeft) + parseFloat(viewportStyles.paddingRight);
   const viewportWidth = elements.previewViewport.clientWidth - paddingX;
-  const scale = clamp((viewportWidth / pageWidthPx) * 100, 60, 140);
+  const scale = clamp(
+    (viewportWidth / pageWidthPx) * 100,
+    PREVIEW_SCALE_MIN,
+    PREVIEW_SCALE_MAX
+  );
   elements.previewScale.value = Math.round(scale);
   applyPreviewScale(scale);
 }
