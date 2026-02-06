@@ -107,7 +107,10 @@ body {
 .settings {
   flex: 1;
   min-height: 240px;
-  overflow: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .panel-header {
@@ -265,6 +268,9 @@ body {
   border-radius: 12px;
   padding: 12px;
   background: #fff;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
 }
 
 .hidden {
@@ -381,6 +387,18 @@ body {
   top: -9999px;
   visibility: hidden;
   overflow: hidden;
+}
+
+.measure-box .question {
+  white-space: nowrap;
+  display: inline-block;
+  margin-left: 0.6mm;
+}
+
+.measure-box .measure-word {
+  padding: 0 1.2mm;
+  word-break: normal;
+  overflow-wrap: normal;
 }
 
 @media (max-width: 980px) {

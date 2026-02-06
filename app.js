@@ -973,7 +973,8 @@ body {
 }
 
 .image-card .header {
-  font-size: 28pt;
+  font-size: ${fontPt}pt;
+  line-height: 1.1;
   margin-bottom: 2mm;
   color: ${settings.textColorHex};
   text-align: center;
@@ -992,14 +993,18 @@ body {
   width: 100%;
   height: 100%;
   text-align: center;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .image-card .img-box {
+  flex: 1 1 auto;
   display: block;
   margin: 0 auto;
   width: 100%;
-  height: calc(100% - 7mm);
+  min-height: 0;
   box-sizing: border-box;
   padding: 1mm;
   overflow: hidden;
@@ -1010,7 +1015,7 @@ body {
   display: inline-block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: inherit;
 }
 `;
