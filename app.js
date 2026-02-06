@@ -1143,11 +1143,13 @@ body {
 @media screen {
   body {
     background: transparent;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   .page {
-    margin: 6mm auto 8mm auto;
-    box-shadow: 0 0 4mm rgba(0,0,0,0.25);
+    margin: 4mm auto;
+    box-shadow: none;
   }
 }
 
@@ -1880,6 +1882,51 @@ function setupPreviewControls() {
   elements.previewFit.addEventListener("click", () => {
     fitPreviewToWidth();
   });
+  if (elements.previewViewport) {
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let startScrollLeft = 0;
+    let startScrollTop = 0;
+
+    const stopDragging = (event) => {
+      if (!isDragging) {
+        return;
+      }
+      isDragging = false;
+      elements.previewViewport.classList.remove("is-dragging");
+      if (event && elements.previewViewport.hasPointerCapture(event.pointerId)) {
+        elements.previewViewport.releasePointerCapture(event.pointerId);
+      }
+    };
+
+    elements.previewViewport.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0) {
+        return;
+      }
+      isDragging = true;
+      startX = event.clientX;
+      startY = event.clientY;
+      startScrollLeft = elements.previewViewport.scrollLeft;
+      startScrollTop = elements.previewViewport.scrollTop;
+      elements.previewViewport.classList.add("is-dragging");
+      elements.previewViewport.setPointerCapture(event.pointerId);
+    });
+
+    elements.previewViewport.addEventListener("pointermove", (event) => {
+      if (!isDragging) {
+        return;
+      }
+      const deltaX = event.clientX - startX;
+      const deltaY = event.clientY - startY;
+      elements.previewViewport.scrollLeft = startScrollLeft - deltaX;
+      elements.previewViewport.scrollTop = startScrollTop - deltaY;
+    });
+
+    elements.previewViewport.addEventListener("pointerup", stopDragging);
+    elements.previewViewport.addEventListener("pointerleave", stopDragging);
+    elements.previewViewport.addEventListener("pointercancel", stopDragging);
+  }
   if (elements.mobilePreviewToggle && elements.previewPanel) {
     elements.mobilePreviewToggle.addEventListener("click", () => {
       elements.previewPanel.classList.toggle("is-open");

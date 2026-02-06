@@ -12,7 +12,7 @@
   --color-accent-secondary: #0ea5e9;
   --color-topbar-bg: #111827;
   --color-topbar-text: #ffffff;
-  --color-preview-bg: transparent;
+  --color-preview-bg: #e6e8ef;
   background: var(--color-bg);
   color: var(--color-text);
 }
@@ -422,6 +422,13 @@ body {
   padding: 12px;
   min-height: 0;
   display: flex;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.preview-viewport.is-dragging {
+  cursor: grabbing;
 }
 
 .mobile-preview-toggle {
@@ -445,6 +452,7 @@ body {
   background: #fff;
   transform-origin: top left;
   flex: 1;
+  pointer-events: none;
 }
 
 .measure-box {
