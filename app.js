@@ -57,12 +57,17 @@ const elements = {
   cardShadowEnabled: document.getElementById("card-shadow-enabled"),
   cardRoundedEnabled: document.getElementById("card-rounded-enabled"),
   cardRadius: document.getElementById("card-radius"),
+  imageRoundedEnabled: document.getElementById("image-rounded-enabled"),
   imageRadius: document.getElementById("image-radius"),
+  imageShadowEnabled: document.getElementById("image-shadow-enabled"),
   showCutLines: document.getElementById("show-cutlines"),
   bgColorFields: document.querySelectorAll(".field-bg-color"),
   bgGradientFields: document.querySelectorAll(".field-bg-gradient"),
   borderFields: document.querySelectorAll(".field-border"),
   lineFields: document.querySelectorAll(".field-line"),
+  cardRadiusFields: document.querySelectorAll(".field-card-radius"),
+  imageRadiusFields: document.querySelectorAll(".field-image-radius"),
+  imageOnlyFields: document.querySelectorAll(".field-image-only"),
   fontSystemFields: document.querySelectorAll(".field-font-system"),
   fontGoogleFields: document.querySelectorAll(".field-font-google"),
   settingsTabs: document.querySelectorAll(".settings-tab"),
@@ -102,7 +107,9 @@ function createDefaultSettings() {
     cardShadowEnabled: false,
     cardRoundedEnabled: true,
     cardRadiusMm: 4,
+    imageRoundedEnabled: true,
     imageRadiusMm: 3,
+    imageShadowEnabled: false,
     showCutLines: false,
   };
 }
@@ -131,7 +138,9 @@ const STYLE_PRESETS = [
       cardShadowEnabled: false,
       cardRoundedEnabled: true,
       cardRadiusMm: 4,
+      imageRoundedEnabled: true,
       imageRadiusMm: 3,
+      imageShadowEnabled: false,
       showCutLines: false,
     },
   },
@@ -158,7 +167,9 @@ const STYLE_PRESETS = [
       cardShadowEnabled: true,
       cardRoundedEnabled: true,
       cardRadiusMm: 5,
+      imageRoundedEnabled: true,
       imageRadiusMm: 3.5,
+      imageShadowEnabled: false,
       showCutLines: false,
     },
   },
@@ -185,7 +196,9 @@ const STYLE_PRESETS = [
       cardShadowEnabled: false,
       cardRoundedEnabled: false,
       cardRadiusMm: 0,
+      imageRoundedEnabled: true,
       imageRadiusMm: 1.5,
+      imageShadowEnabled: false,
       showCutLines: true,
     },
   },
@@ -212,7 +225,9 @@ const STYLE_PRESETS = [
       cardShadowEnabled: true,
       cardRoundedEnabled: true,
       cardRadiusMm: 6,
+      imageRoundedEnabled: true,
       imageRadiusMm: 4,
+      imageShadowEnabled: false,
       showCutLines: false,
     },
   },
@@ -239,7 +254,9 @@ const STYLE_PRESETS = [
       cardShadowEnabled: true,
       cardRoundedEnabled: true,
       cardRadiusMm: 7,
+      imageRoundedEnabled: true,
       imageRadiusMm: 4.5,
+      imageShadowEnabled: false,
       showCutLines: false,
     },
   },
@@ -266,7 +283,9 @@ const STYLE_PRESETS = [
       cardShadowEnabled: false,
       cardRoundedEnabled: true,
       cardRadiusMm: 4,
+      imageRoundedEnabled: true,
       imageRadiusMm: 3,
+      imageShadowEnabled: false,
       showCutLines: false,
     },
   },
@@ -293,7 +312,9 @@ const STYLE_PRESETS = [
       cardShadowEnabled: true,
       cardRoundedEnabled: true,
       cardRadiusMm: 6,
+      imageRoundedEnabled: true,
       imageRadiusMm: 4,
+      imageShadowEnabled: false,
       showCutLines: false,
     },
   },
@@ -320,7 +341,9 @@ const STYLE_PRESETS = [
       cardShadowEnabled: false,
       cardRoundedEnabled: true,
       cardRadiusMm: 5,
+      imageRoundedEnabled: true,
       imageRadiusMm: 3.5,
+      imageShadowEnabled: false,
       showCutLines: false,
     },
   },
@@ -347,7 +370,9 @@ const STYLE_PRESETS = [
       cardShadowEnabled: true,
       cardRoundedEnabled: true,
       cardRadiusMm: 7,
+      imageRoundedEnabled: true,
       imageRadiusMm: 4.5,
+      imageShadowEnabled: false,
       showCutLines: false,
     },
   },
@@ -442,7 +467,9 @@ function updateSettingsFromInputs() {
   settings.cardShadowEnabled = elements.cardShadowEnabled.checked;
   settings.cardRoundedEnabled = elements.cardRoundedEnabled.checked;
   settings.cardRadiusMm = clamp(Number(elements.cardRadius.value) || 0, 0, 10);
+  settings.imageRoundedEnabled = elements.imageRoundedEnabled.checked;
   settings.imageRadiusMm = clamp(Number(elements.imageRadius.value) || 0, 0, 10);
+  settings.imageShadowEnabled = elements.imageShadowEnabled.checked;
   settings.showCutLines = elements.showCutLines.checked;
 }
 
@@ -471,17 +498,22 @@ function applySettingsToInputs(settings = getSettingsForMode()) {
   elements.cardShadowEnabled.checked = settings.cardShadowEnabled;
   elements.cardRoundedEnabled.checked = settings.cardRoundedEnabled;
   elements.cardRadius.value = settings.cardRadiusMm;
+  elements.imageRoundedEnabled.checked = settings.imageRoundedEnabled;
   elements.imageRadius.value = settings.imageRadiusMm;
+  elements.imageShadowEnabled.checked = settings.imageShadowEnabled;
   elements.showCutLines.checked = settings.showCutLines;
   updateFontSizeModeUI();
   refreshFontStatus();
   updateTextFitWarning("");
   syncConditionalFields();
+  if (state.project.mode === "text") {
+    updateEditorFont();
+  }
 }
 
 function bindSettingsEvents() {
   const inputs = document.querySelectorAll(
-    "#text-color, #text-shadow, #font-name, #font-google, #font-size-mode, #font-size-fixed, #card-bg-mode, #card-bg-color, #card-bg-gradient-type, #card-bg-gradient-direction, #card-bg-grad-1, #card-bg-grad-2, #card-border-enabled, #card-border-color, #card-border-width, #card-border-style, #card-line-enabled, #card-line-color, #card-line-width, #card-line-style, #card-shadow-enabled, #card-rounded-enabled, #card-radius, #image-radius, #show-cutlines"
+    "#text-color, #text-shadow, #font-name, #font-google, #font-size-mode, #font-size-fixed, #card-bg-mode, #card-bg-color, #card-bg-gradient-type, #card-bg-gradient-direction, #card-bg-grad-1, #card-bg-grad-2, #card-border-enabled, #card-border-color, #card-border-width, #card-border-style, #card-line-enabled, #card-line-color, #card-line-width, #card-line-style, #card-shadow-enabled, #card-rounded-enabled, #card-radius, #image-rounded-enabled, #image-radius, #image-shadow-enabled, #show-cutlines"
   );
 
   inputs.forEach((input) => {
@@ -528,6 +560,7 @@ function refreshFontStatus() {
         ? `Wczytano Google Font: ${settings.fontGoogleName}`
         : `Nie znaleziono Google Font: ${settings.fontGoogleName}`
     );
+    updateEditorFont();
     schedulePreview();
   });
 }
@@ -552,10 +585,15 @@ function syncConditionalFields() {
 
   toggleDisabled(elements.borderFields, !settings.cardBorderEnabled);
   toggleDisabled(elements.lineFields, !settings.cardLineEnabled);
+  toggleDisabled(elements.cardRadiusFields, !settings.cardRoundedEnabled);
+  toggleDisabled(elements.imageRadiusFields, !settings.imageRoundedEnabled);
 
   const googleEnabled = settings.fontGoogleEnabled;
   toggleFields(elements.fontGoogleFields, googleEnabled);
   toggleFields(elements.fontSystemFields, !googleEnabled);
+
+  const isImageMode = state.project.mode === "image";
+  toggleFields(elements.imageOnlyFields, isImageMode);
 }
 
 async function loadGoogleFont(name) {
@@ -565,8 +603,7 @@ async function loadGoogleFont(name) {
   if (state.loadedGoogleFonts.has(name)) {
     return true;
   }
-  const urlName = name.trim().replace(/\s+/g, "+");
-  const href = `https://fonts.googleapis.com/css2?family=${urlName}:wght@400;700&display=swap`;
+  const href = getGoogleFontHref(name);
   try {
     const response = await fetch(href);
     if (!response.ok) {
@@ -590,6 +627,25 @@ async function loadGoogleFont(name) {
   } catch (error) {
     return false;
   }
+}
+
+function getGoogleFontHref(name) {
+  const urlName = name.trim().replace(/\s+/g, "+");
+  return `https://fonts.googleapis.com/css2?family=${urlName}:wght@400;700&display=swap`;
+}
+
+function updateEditorFont() {
+  if (!state.editorReady) {
+    return;
+  }
+  const editor = tinymce.get("text-editor");
+  if (!editor) {
+    return;
+  }
+  const settings = getSettingsForMode("text");
+  const fontFamily = getFontFamily(settings);
+  editor.getBody().style.fontFamily = fontFamily;
+  editor.getBody().style.color = settings.textColorHex;
 }
 
 function setupTabs() {
@@ -634,6 +690,7 @@ function setupEditor() {
       editor.on("init", () => {
         editor.setContent(state.project.textHtml || "");
         state.editorReady = true;
+        updateEditorFont();
         schedulePreview();
       });
       editor.on("input change keyup", () => {
@@ -718,10 +775,7 @@ function normalizeSettings(settings = {}) {
 }
 
 function getFontFamily(settings) {
-  const hasGoogleFont =
-    settings.fontGoogleEnabled &&
-    settings.fontGoogleName &&
-    state.loadedGoogleFonts.has(settings.fontGoogleName);
+  const hasGoogleFont = settings.fontGoogleEnabled && settings.fontGoogleName;
   return hasGoogleFont
     ? `"${settings.fontGoogleName}", "${settings.fontName}", serif`
     : `"${settings.fontName}", serif`;
@@ -860,6 +914,11 @@ function buildCss(settings, fontPt) {
   const radiusCss = settings.cardRoundedEnabled
     ? `border-radius: ${radiusValue}mm; overflow: hidden;`
     : "border-radius: 0; overflow: visible;";
+
+  const imageRadiusValue = settings.imageRoundedEnabled ? settings.imageRadiusMm : 0;
+  const imageShadowCss = settings.imageShadowEnabled
+    ? "box-shadow: 0 1.2mm 2.4mm rgba(0,0,0,0.25);"
+    : "box-shadow: none;";
 
   let css = `
 @page {
@@ -1052,22 +1111,25 @@ body {
 
 .image-card .img-box {
   flex: 1 1 auto;
-  display: block;
+  display: flex;
   margin: 0 auto;
   width: 100%;
   min-height: 0;
   box-sizing: border-box;
   padding: 1mm;
-  overflow: hidden;
-  border-radius: ${settings.imageRadiusMm}mm;
+  overflow: visible;
+  align-items: center;
+  justify-content: center;
 }
 
 .image-card img {
-  display: inline-block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: ${settings.imageRadiusMm}mm;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  border-radius: ${imageRadiusValue}mm;
+  ${imageShadowCss}
 }
 `;
 
@@ -1107,13 +1169,18 @@ body {
   return css;
 }
 
-function buildFullHtml(css, body) {
+function buildFullHtml(css, body, settings) {
+  const fontLink =
+    settings.fontGoogleEnabled && settings.fontGoogleName
+      ? `<link rel="stylesheet" href="${getGoogleFontHref(settings.fontGoogleName)}" />`
+      : "";
   return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>Karty</title>
+  ${fontLink}
   <style>${css}</style>
 </head>
 <body>
@@ -1283,7 +1350,7 @@ function renderPreview() {
   }
 
   const css = buildCss(settings, fontPt);
-  const html = buildFullHtml(css, body);
+  const html = buildFullHtml(css, body, settings);
   elements.previewFrame.srcdoc = html;
 }
 
@@ -1507,7 +1574,7 @@ function handlePrint() {
   }
 
   const css = buildCss(settings, fontPt);
-  const html = buildFullHtml(css, body);
+  const html = buildFullHtml(css, body, settings);
   const printWindow = window.open("", "_blank");
   if (!printWindow) {
     window.alert("Nie udało się otworzyć okna drukowania. Sprawdź blokadę popupów.");
@@ -1558,6 +1625,7 @@ function setupFontControls() {
 
   elements.fontName.addEventListener("change", () => {
     refreshFontStatus();
+    updateEditorFont();
     schedulePreview();
   });
 
@@ -1565,12 +1633,14 @@ function setupFontControls() {
     updateSettingsFromInputs();
     syncConditionalFields();
     refreshFontStatus();
+    updateEditorFont();
     schedulePreview();
   });
 
   elements.fontGoogle.addEventListener("change", async () => {
     updateSettingsFromInputs();
     refreshFontStatus();
+    updateEditorFont();
     schedulePreview();
   });
 }
@@ -1607,6 +1677,7 @@ function setupStylePresets() {
     state.project.stylePresetByMode[state.project.mode] = elements.stylePreset.value;
     applySettingsToInputs(getSettingsForMode());
     syncConditionalFields();
+    updateEditorFont();
     setDirty(true);
     schedulePreview();
   });
