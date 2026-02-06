@@ -121,6 +121,9 @@ const STYLE_PRESETS = [
     settings: {
       textColorHex: "#000000",
       textShadowEnabled: false,
+      fontName: "Times New Roman",
+      fontGoogleName: "",
+      fontGoogleEnabled: false,
       cardBackgroundMode: "white",
       cardBackgroundColorHex: "#ffffff",
       cardBackgroundGradientType: "linear",
@@ -150,6 +153,9 @@ const STYLE_PRESETS = [
     settings: {
       textColorHex: "#003366",
       textShadowEnabled: false,
+      fontName: "Georgia",
+      fontGoogleName: "",
+      fontGoogleEnabled: false,
       cardBackgroundMode: "gradient",
       cardBackgroundColorHex: "#ffffff",
       cardBackgroundGradientType: "linear",
@@ -179,6 +185,9 @@ const STYLE_PRESETS = [
     settings: {
       textColorHex: "#111827",
       textShadowEnabled: false,
+      fontName: "Courier New",
+      fontGoogleName: "",
+      fontGoogleEnabled: false,
       cardBackgroundMode: "color",
       cardBackgroundColorHex: "#ffffff",
       cardBackgroundGradientType: "linear",
@@ -208,6 +217,9 @@ const STYLE_PRESETS = [
     settings: {
       textColorHex: "#334455",
       textShadowEnabled: false,
+      fontName: "Verdana",
+      fontGoogleName: "Quicksand",
+      fontGoogleEnabled: true,
       cardBackgroundMode: "gradient",
       cardBackgroundColorHex: "#ffffff",
       cardBackgroundGradientType: "radial",
@@ -237,6 +249,9 @@ const STYLE_PRESETS = [
     settings: {
       textColorHex: "#1f1330",
       textShadowEnabled: true,
+      fontName: "Tahoma",
+      fontGoogleName: "Fredoka",
+      fontGoogleEnabled: true,
       cardBackgroundMode: "gradient",
       cardBackgroundColorHex: "#ffffff",
       cardBackgroundGradientType: "linear",
@@ -266,6 +281,9 @@ const STYLE_PRESETS = [
     settings: {
       textColorHex: "#f8fafc",
       textShadowEnabled: true,
+      fontName: "Arial",
+      fontGoogleName: "Poppins",
+      fontGoogleEnabled: true,
       cardBackgroundMode: "color",
       cardBackgroundColorHex: "#0f172a",
       cardBackgroundGradientType: "linear",
@@ -295,6 +313,9 @@ const STYLE_PRESETS = [
     settings: {
       textColorHex: "#0f172a",
       textShadowEnabled: true,
+      fontName: "Verdana",
+      fontGoogleName: "Montserrat",
+      fontGoogleEnabled: true,
       cardBackgroundMode: "gradient",
       cardBackgroundColorHex: "#ffffff",
       cardBackgroundGradientType: "radial",
@@ -324,6 +345,9 @@ const STYLE_PRESETS = [
     settings: {
       textColorHex: "#1f2a1f",
       textShadowEnabled: false,
+      fontName: "Georgia",
+      fontGoogleName: "Merriweather",
+      fontGoogleEnabled: true,
       cardBackgroundMode: "gradient",
       cardBackgroundColorHex: "#ffffff",
       cardBackgroundGradientType: "linear",
@@ -353,6 +377,9 @@ const STYLE_PRESETS = [
     settings: {
       textColorHex: "#1f2937",
       textShadowEnabled: true,
+      fontName: "Arial",
+      fontGoogleName: "Raleway",
+      fontGoogleEnabled: true,
       cardBackgroundMode: "gradient",
       cardBackgroundColorHex: "#ffffff",
       cardBackgroundGradientType: "linear",
@@ -373,6 +400,134 @@ const STYLE_PRESETS = [
       imageRoundedEnabled: true,
       imageRadiusMm: 4.5,
       imageShadowEnabled: false,
+      showCutLines: false,
+    },
+  },
+  {
+    id: "candy",
+    name: "Candy Pop",
+    settings: {
+      textColorHex: "#3b0764",
+      textShadowEnabled: true,
+      fontName: "Verdana",
+      fontGoogleName: "Baloo 2",
+      fontGoogleEnabled: true,
+      cardBackgroundMode: "gradient",
+      cardBackgroundColorHex: "#ffffff",
+      cardBackgroundGradientType: "linear",
+      cardBackgroundGradientDirection: "diagonal",
+      cardBackgroundGradColor1Hex: "#fbcfe8",
+      cardBackgroundGradColor2Hex: "#bae6fd",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#f472b6",
+      cardBorderWidthMm: 0.8,
+      cardBorderStyle: "dashed",
+      cardLineEnabled: true,
+      cardLineColorHex: "#f472b6",
+      cardLineWidthMm: 0.6,
+      cardLineStyle: "dotted",
+      cardShadowEnabled: true,
+      cardRoundedEnabled: true,
+      cardRadiusMm: 8,
+      imageRoundedEnabled: true,
+      imageRadiusMm: 5,
+      imageShadowEnabled: true,
+      showCutLines: false,
+    },
+  },
+  {
+    id: "ocean",
+    name: "Ocean Breeze",
+    settings: {
+      textColorHex: "#0f172a",
+      textShadowEnabled: false,
+      fontName: "Arial",
+      fontGoogleName: "Nunito",
+      fontGoogleEnabled: true,
+      cardBackgroundMode: "gradient",
+      cardBackgroundColorHex: "#ffffff",
+      cardBackgroundGradientType: "radial",
+      cardBackgroundGradientDirection: "diagonal",
+      cardBackgroundGradColor1Hex: "#cffafe",
+      cardBackgroundGradColor2Hex: "#bae6fd",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#0284c7",
+      cardBorderWidthMm: 0.6,
+      cardBorderStyle: "solid",
+      cardLineEnabled: true,
+      cardLineColorHex: "#0284c7",
+      cardLineWidthMm: 0.6,
+      cardLineStyle: "solid",
+      cardShadowEnabled: false,
+      cardRoundedEnabled: true,
+      cardRadiusMm: 6,
+      imageRoundedEnabled: true,
+      imageRadiusMm: 4,
+      imageShadowEnabled: false,
+      showCutLines: false,
+    },
+  },
+  {
+    id: "minimal",
+    name: "Minimal Bold",
+    settings: {
+      textColorHex: "#111827",
+      textShadowEnabled: false,
+      fontName: "Arial",
+      fontGoogleName: "",
+      fontGoogleEnabled: false,
+      cardBackgroundMode: "white",
+      cardBackgroundColorHex: "#ffffff",
+      cardBackgroundGradientType: "linear",
+      cardBackgroundGradientDirection: "vertical",
+      cardBackgroundGradColor1Hex: "#ffffff",
+      cardBackgroundGradColor2Hex: "#ffffff",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#111827",
+      cardBorderWidthMm: 0.4,
+      cardBorderStyle: "solid",
+      cardLineEnabled: true,
+      cardLineColorHex: "#111827",
+      cardLineWidthMm: 0.4,
+      cardLineStyle: "solid",
+      cardShadowEnabled: false,
+      cardRoundedEnabled: false,
+      cardRadiusMm: 0,
+      imageRoundedEnabled: false,
+      imageRadiusMm: 0,
+      imageShadowEnabled: false,
+      showCutLines: false,
+    },
+  },
+  {
+    id: "deco",
+    name: "Art Deco",
+    settings: {
+      textColorHex: "#1c1917",
+      textShadowEnabled: true,
+      fontName: "Times New Roman",
+      fontGoogleName: "Playfair Display",
+      fontGoogleEnabled: true,
+      cardBackgroundMode: "gradient",
+      cardBackgroundColorHex: "#ffffff",
+      cardBackgroundGradientType: "linear",
+      cardBackgroundGradientDirection: "vertical",
+      cardBackgroundGradColor1Hex: "#fef9c3",
+      cardBackgroundGradColor2Hex: "#fde68a",
+      cardBorderEnabled: true,
+      cardBorderColorHex: "#a16207",
+      cardBorderWidthMm: 0.9,
+      cardBorderStyle: "solid",
+      cardLineEnabled: true,
+      cardLineColorHex: "#a16207",
+      cardLineWidthMm: 0.6,
+      cardLineStyle: "solid",
+      cardShadowEnabled: true,
+      cardRoundedEnabled: true,
+      cardRadiusMm: 5,
+      imageRoundedEnabled: true,
+      imageRadiusMm: 3.5,
+      imageShadowEnabled: true,
       showCutLines: false,
     },
   },
@@ -673,8 +828,19 @@ function setupSettingsTabs() {
   setActiveTab("text");
 }
 
-function setupEditor() {
-  tinymce.init({
+function getCurrentTheme() {
+  return document.body.classList.contains("theme-dark") ? "dark" : "light";
+}
+
+function getEditorThemeConfig(theme) {
+  return theme === "dark"
+    ? { skin: "oxide-dark", content_css: "dark" }
+    : { skin: "oxide", content_css: "default" };
+}
+
+function buildEditorConfig(initialContent, theme) {
+  const themeConfig = getEditorThemeConfig(theme);
+  return {
     selector: "#text-editor",
     menubar: false,
     statusbar: false,
@@ -686,9 +852,11 @@ function setupEditor() {
     forced_root_block: "div",
     forced_root_block_attrs: {},
     paste_as_text: true,
+    skin: themeConfig.skin,
+    content_css: themeConfig.content_css,
     setup: (editor) => {
       editor.on("init", () => {
-        editor.setContent(state.project.textHtml || "");
+        editor.setContent(initialContent || "");
         state.editorReady = true;
         updateEditorFont();
         schedulePreview();
@@ -699,7 +867,26 @@ function setupEditor() {
         schedulePreview();
       });
     },
-  });
+  };
+}
+
+function setupEditor(initialContent = state.project.textHtml || "") {
+  tinymce.init(buildEditorConfig(initialContent, getCurrentTheme()));
+}
+
+function refreshEditorTheme(theme) {
+  const editor = tinymce.get("text-editor");
+  if (!editor) {
+    return;
+  }
+  const desiredSkin = getEditorThemeConfig(theme).skin;
+  if (editor.settings.skin === desiredSkin) {
+    return;
+  }
+  const content = editor.getContent({ format: "html" });
+  editor.remove();
+  state.editorReady = false;
+  tinymce.init(buildEditorConfig(content, theme));
 }
 
 function normalizeHtmlToItems(html) {
@@ -955,7 +1142,7 @@ body {
 
 @media screen {
   body {
-    background: #d0d0d0;
+    background: transparent;
   }
 
   .page {
@@ -1367,7 +1554,10 @@ function fitPreviewToWidth() {
     state.mmToPx = computeMmToPx();
   }
   const pageWidthPx = 297 * state.mmToPx;
-  const viewportWidth = elements.previewViewport.clientWidth - 24;
+  const viewportStyles = getComputedStyle(elements.previewViewport);
+  const paddingX =
+    parseFloat(viewportStyles.paddingLeft) + parseFloat(viewportStyles.paddingRight);
+  const viewportWidth = elements.previewViewport.clientWidth - paddingX;
   const scale = clamp((viewportWidth / pageWidthPx) * 100, 60, 140);
   elements.previewScale.value = Math.round(scale);
   applyPreviewScale(scale);
@@ -1671,8 +1861,6 @@ function setupStylePresets() {
     setSettingsForMode(state.project.mode, {
       ...currentSettings,
       ...preset.settings,
-      fontGoogleEnabled: false,
-      fontGoogleName: "",
     });
     state.project.stylePresetByMode[state.project.mode] = elements.stylePreset.value;
     applySettingsToInputs(getSettingsForMode());
@@ -1707,6 +1895,7 @@ function applyTheme(theme) {
   if (elements.themeToggle) {
     elements.themeToggle.checked = theme === "dark";
   }
+  refreshEditorTheme(theme);
 }
 
 function setupThemeToggle() {

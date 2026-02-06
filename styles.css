@@ -12,7 +12,7 @@
   --color-accent-secondary: #0ea5e9;
   --color-topbar-bg: #111827;
   --color-topbar-text: #ffffff;
-  --color-preview-bg: #f3f4f6;
+  --color-preview-bg: transparent;
   background: var(--color-bg);
   color: var(--color-text);
 }
@@ -29,7 +29,7 @@ body.theme-dark {
   --color-accent-secondary: #38bdf8;
   --color-topbar-bg: #020617;
   --color-topbar-text: #f8fafc;
-  --color-preview-bg: #0b1220;
+  --color-preview-bg: transparent;
 }
 
 * {
