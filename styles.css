@@ -12,7 +12,7 @@
 body {
   margin: 0;
   background: #f3f4f8;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .app {
@@ -95,7 +95,7 @@ body {
 .controls,
 .settings {
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .controls {
@@ -107,6 +107,7 @@ body {
 .settings {
   flex: 1;
   min-height: 240px;
+  overflow: auto;
 }
 
 .panel-header {
@@ -362,6 +363,8 @@ body {
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
+  position: relative;
+  z-index: 6;
 }
 
 .preview iframe {
@@ -386,7 +389,7 @@ body {
   }
 
   body {
-    overflow: auto;
+    overflow: hidden;
   }
 
   .app {

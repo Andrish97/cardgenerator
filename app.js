@@ -91,16 +91,16 @@ function createDefaultSettings() {
     cardBackgroundGradColor2Hex: "#e0ecff",
     cardBorderEnabled: true,
     cardBorderColorHex: "#3366cc",
-    cardBorderWidthPx: 2,
+    cardBorderWidthMm: 0.6,
     cardBorderStyle: "solid",
     cardLineEnabled: true,
     cardLineColorHex: "#3366cc",
-    cardLineWidthPx: 2,
+    cardLineWidthMm: 0.6,
     cardLineStyle: "solid",
     cardShadowEnabled: false,
     cardRoundedEnabled: true,
     cardRadiusMm: 4,
-    imageRadiusPx: 12,
+    imageRadiusMm: 3,
     showCutLines: false,
   };
 }
@@ -120,16 +120,16 @@ const STYLE_PRESETS = [
       cardBackgroundGradColor2Hex: "#e0ecff",
       cardBorderEnabled: true,
       cardBorderColorHex: "#3366cc",
-      cardBorderWidthPx: 2,
+      cardBorderWidthMm: 0.6,
       cardBorderStyle: "solid",
       cardLineEnabled: true,
       cardLineColorHex: "#3366cc",
-      cardLineWidthPx: 2,
+      cardLineWidthMm: 0.6,
       cardLineStyle: "solid",
       cardShadowEnabled: false,
       cardRoundedEnabled: true,
       cardRadiusMm: 4,
-      imageRadiusPx: 12,
+      imageRadiusMm: 3,
       showCutLines: false,
     },
   },
@@ -147,16 +147,16 @@ const STYLE_PRESETS = [
       cardBackgroundGradColor2Hex: "#cce0ff",
       cardBorderEnabled: true,
       cardBorderColorHex: "#6699cc",
-      cardBorderWidthPx: 2,
+      cardBorderWidthMm: 0.6,
       cardBorderStyle: "solid",
       cardLineEnabled: true,
       cardLineColorHex: "#6699cc",
-      cardLineWidthPx: 2,
+      cardLineWidthMm: 0.6,
       cardLineStyle: "solid",
       cardShadowEnabled: true,
       cardRoundedEnabled: true,
       cardRadiusMm: 5,
-      imageRadiusPx: 14,
+      imageRadiusMm: 3.5,
       showCutLines: false,
     },
   },
@@ -174,16 +174,16 @@ const STYLE_PRESETS = [
       cardBackgroundGradColor2Hex: "#ffffff",
       cardBorderEnabled: true,
       cardBorderColorHex: "#111827",
-      cardBorderWidthPx: 2,
+      cardBorderWidthMm: 0.6,
       cardBorderStyle: "dashed",
       cardLineEnabled: true,
       cardLineColorHex: "#111827",
-      cardLineWidthPx: 2,
+      cardLineWidthMm: 0.6,
       cardLineStyle: "dotted",
       cardShadowEnabled: false,
       cardRoundedEnabled: false,
       cardRadiusMm: 0,
-      imageRadiusPx: 6,
+      imageRadiusMm: 1.5,
       showCutLines: true,
     },
   },
@@ -201,16 +201,16 @@ const STYLE_PRESETS = [
       cardBackgroundGradColor2Hex: "#e0f7ff",
       cardBorderEnabled: true,
       cardBorderColorHex: "#ff9999",
-      cardBorderWidthPx: 2,
+      cardBorderWidthMm: 0.6,
       cardBorderStyle: "solid",
       cardLineEnabled: true,
       cardLineColorHex: "#ff9999",
-      cardLineWidthPx: 2,
+      cardLineWidthMm: 0.6,
       cardLineStyle: "solid",
       cardShadowEnabled: true,
       cardRoundedEnabled: true,
       cardRadiusMm: 6,
-      imageRadiusPx: 16,
+      imageRadiusMm: 4,
       showCutLines: false,
     },
   },
@@ -228,16 +228,16 @@ const STYLE_PRESETS = [
       cardBackgroundGradColor2Hex: "#ff92b5",
       cardBorderEnabled: true,
       cardBorderColorHex: "#6a0dad",
-      cardBorderWidthPx: 3,
+      cardBorderWidthMm: 0.8,
       cardBorderStyle: "solid",
       cardLineEnabled: true,
       cardLineColorHex: "#6a0dad",
-      cardLineWidthPx: 3,
+      cardLineWidthMm: 0.8,
       cardLineStyle: "solid",
       cardShadowEnabled: true,
       cardRoundedEnabled: true,
       cardRadiusMm: 7,
-      imageRadiusPx: 18,
+      imageRadiusMm: 4.5,
       showCutLines: false,
     },
   },
@@ -255,16 +255,16 @@ const STYLE_PRESETS = [
       cardBackgroundGradColor2Hex: "#1e293b",
       cardBorderEnabled: true,
       cardBorderColorHex: "#38bdf8",
-      cardBorderWidthPx: 2,
+      cardBorderWidthMm: 0.6,
       cardBorderStyle: "solid",
       cardLineEnabled: true,
       cardLineColorHex: "#38bdf8",
-      cardLineWidthPx: 2,
+      cardLineWidthMm: 0.6,
       cardLineStyle: "dashed",
       cardShadowEnabled: false,
       cardRoundedEnabled: true,
       cardRadiusMm: 4,
-      imageRadiusPx: 12,
+      imageRadiusMm: 3,
       showCutLines: false,
     },
   },
@@ -282,16 +282,16 @@ const STYLE_PRESETS = [
       cardBackgroundGradColor2Hex: "#ffe3b3",
       cardBorderEnabled: true,
       cardBorderColorHex: "#0ea5e9",
-      cardBorderWidthPx: 2,
+      cardBorderWidthMm: 0.6,
       cardBorderStyle: "solid",
       cardLineEnabled: true,
       cardLineColorHex: "#0ea5e9",
-      cardLineWidthPx: 2,
+      cardLineWidthMm: 0.6,
       cardLineStyle: "dashed",
       cardShadowEnabled: true,
       cardRoundedEnabled: true,
       cardRadiusMm: 6,
-      imageRadiusPx: 16,
+      imageRadiusMm: 4,
       showCutLines: false,
     },
   },
@@ -309,16 +309,16 @@ const STYLE_PRESETS = [
       cardBackgroundGradColor2Hex: "#b7e4c7",
       cardBorderEnabled: true,
       cardBorderColorHex: "#2f855a",
-      cardBorderWidthPx: 2,
+      cardBorderWidthMm: 0.6,
       cardBorderStyle: "solid",
       cardLineEnabled: true,
       cardLineColorHex: "#2f855a",
-      cardLineWidthPx: 2,
+      cardLineWidthMm: 0.6,
       cardLineStyle: "solid",
       cardShadowEnabled: false,
       cardRoundedEnabled: true,
       cardRadiusMm: 5,
-      imageRadiusPx: 14,
+      imageRadiusMm: 3.5,
       showCutLines: false,
     },
   },
@@ -336,16 +336,16 @@ const STYLE_PRESETS = [
       cardBackgroundGradColor2Hex: "#fca5a5",
       cardBorderEnabled: true,
       cardBorderColorHex: "#f97316",
-      cardBorderWidthPx: 3,
+      cardBorderWidthMm: 0.8,
       cardBorderStyle: "solid",
       cardLineEnabled: true,
       cardLineColorHex: "#f97316",
-      cardLineWidthPx: 3,
+      cardLineWidthMm: 0.8,
       cardLineStyle: "dashed",
       cardShadowEnabled: true,
       cardRoundedEnabled: true,
       cardRadiusMm: 7,
-      imageRadiusPx: 18,
+      imageRadiusMm: 4.5,
       showCutLines: false,
     },
   },
@@ -410,16 +410,16 @@ function updateSettingsFromInputs() {
   settings.cardBackgroundGradColor2Hex = elements.cardBgGrad2.value;
   settings.cardBorderEnabled = elements.cardBorderEnabled.checked;
   settings.cardBorderColorHex = elements.cardBorderColor.value;
-  settings.cardBorderWidthPx = clamp(Number(elements.cardBorderWidth.value) || 0, 0, 12);
+  settings.cardBorderWidthMm = clamp(Number(elements.cardBorderWidth.value) || 0, 0, 5);
   settings.cardBorderStyle = elements.cardBorderStyle.value;
   settings.cardLineEnabled = elements.cardLineEnabled.checked;
   settings.cardLineColorHex = elements.cardLineColor.value;
-  settings.cardLineWidthPx = clamp(Number(elements.cardLineWidth.value) || 0, 0, 12);
+  settings.cardLineWidthMm = clamp(Number(elements.cardLineWidth.value) || 0, 0, 5);
   settings.cardLineStyle = elements.cardLineStyle.value;
   settings.cardShadowEnabled = elements.cardShadowEnabled.checked;
   settings.cardRoundedEnabled = elements.cardRoundedEnabled.checked;
   settings.cardRadiusMm = clamp(Number(elements.cardRadius.value) || 0, 0, 10);
-  settings.imageRadiusPx = clamp(Number(elements.imageRadius.value) || 0, 0, 30);
+  settings.imageRadiusMm = clamp(Number(elements.imageRadius.value) || 0, 0, 10);
   settings.showCutLines = elements.showCutLines.checked;
 }
 
@@ -440,16 +440,16 @@ function applySettingsToInputs() {
   elements.cardBgGrad2.value = settings.cardBackgroundGradColor2Hex;
   elements.cardBorderEnabled.checked = settings.cardBorderEnabled;
   elements.cardBorderColor.value = settings.cardBorderColorHex;
-  elements.cardBorderWidth.value = settings.cardBorderWidthPx;
+  elements.cardBorderWidth.value = settings.cardBorderWidthMm;
   elements.cardBorderStyle.value = settings.cardBorderStyle;
   elements.cardLineEnabled.checked = settings.cardLineEnabled;
   elements.cardLineColor.value = settings.cardLineColorHex;
-  elements.cardLineWidth.value = settings.cardLineWidthPx;
+  elements.cardLineWidth.value = settings.cardLineWidthMm;
   elements.cardLineStyle.value = settings.cardLineStyle;
   elements.cardShadowEnabled.checked = settings.cardShadowEnabled;
   elements.cardRoundedEnabled.checked = settings.cardRoundedEnabled;
   elements.cardRadius.value = settings.cardRadiusMm;
-  elements.imageRadius.value = settings.imageRadiusPx;
+  elements.imageRadius.value = settings.imageRadiusMm;
   elements.showCutLines.checked = settings.showCutLines;
   updateFontSizeModeUI();
   updateFontStatus("");
@@ -645,6 +645,27 @@ function computeMmToPx() {
   return px;
 }
 
+function pxToMm(valuePx) {
+  if (!state.mmToPx) {
+    state.mmToPx = computeMmToPx();
+  }
+  return Math.round((Number(valuePx) / state.mmToPx) * 100) / 100;
+}
+
+function normalizeSettings(settings = {}) {
+  const normalized = { ...createDefaultSettings(), ...settings };
+  if (settings.cardBorderWidthMm == null && settings.cardBorderWidthPx != null) {
+    normalized.cardBorderWidthMm = pxToMm(settings.cardBorderWidthPx);
+  }
+  if (settings.cardLineWidthMm == null && settings.cardLineWidthPx != null) {
+    normalized.cardLineWidthMm = pxToMm(settings.cardLineWidthPx);
+  }
+  if (settings.imageRadiusMm == null && settings.imageRadiusPx != null) {
+    normalized.imageRadiusMm = pxToMm(settings.imageRadiusPx);
+  }
+  return normalized;
+}
+
 function computeAutoFontPt(itemsHtml, settings) {
   if (!itemsHtml.length) {
     return 28;
@@ -751,14 +772,14 @@ function buildCss(settings, fontPt) {
     : "text-shadow: none;";
 
   let borderCss = "border: none;";
-  if (settings.cardBorderEnabled && settings.cardBorderWidthPx > 0) {
-    borderCss = `border: ${settings.cardBorderWidthPx}px ${settings.cardBorderStyle} ${settings.cardBorderColorHex};`;
+  if (settings.cardBorderEnabled && settings.cardBorderWidthMm > 0) {
+    borderCss = `border: ${settings.cardBorderWidthMm}mm ${settings.cardBorderStyle} ${settings.cardBorderColorHex};`;
   }
 
   let lineCss = "border-top: none;";
   let lineDisplay = "display: none;";
-  if (settings.cardLineEnabled && settings.cardLineWidthPx > 0) {
-    lineCss = `border-top: ${settings.cardLineWidthPx}px ${settings.cardLineStyle} ${settings.cardLineColorHex};`;
+  if (settings.cardLineEnabled && settings.cardLineWidthMm > 0) {
+    lineCss = `border-top: ${settings.cardLineWidthMm}mm ${settings.cardLineStyle} ${settings.cardLineColorHex};`;
     lineDisplay = "display: block;";
   }
 
@@ -942,11 +963,13 @@ body {
   overflow: hidden;
   word-break: normal;
   overflow-wrap: normal;
+  padding: 0 1.2mm;
 }
 
 .text-card .question {
   white-space: nowrap;
   display: inline-block;
+  margin-left: 0.6mm;
 }
 
 .image-card .header {
@@ -980,15 +1003,15 @@ body {
   box-sizing: border-box;
   padding: 1mm;
   overflow: hidden;
-  border-radius: ${settings.imageRadiusPx}px;
+  border-radius: ${settings.imageRadiusMm}mm;
 }
 
 .image-card img {
   display: inline-block;
-  border-radius: ${settings.imageRadiusPx}px;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  border-radius: inherit;
 }
 `;
 
@@ -1368,7 +1391,7 @@ function handleLoadProject(file) {
         mode: data.mode === "image" ? "image" : "text",
         textHtml: data.textHtml || "",
         images: Array.isArray(data.images) ? data.images : [],
-        settings: { ...createDefaultSettings(), ...data.settings },
+        settings: normalizeSettings(data.settings),
       };
       applySettingsToInputs();
       elements.stylePreset.value = "custom";
