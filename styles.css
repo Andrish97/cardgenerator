@@ -422,7 +422,7 @@ body {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   background: var(--color-preview-bg);
-  padding: 12px;
+  padding: 0;
   min-height: 0;
   display: flex;
   cursor: grab;
@@ -453,7 +453,7 @@ body {
   height: 100%;
   min-height: 0;
   border: none;
-  background: #fff;
+  background: transparent;
   transform-origin: top left;
   flex: 0 0 auto;
   pointer-events: none;

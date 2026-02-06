@@ -1161,6 +1161,7 @@ body {
 
   .page {
     margin: 4mm auto;
+    background: transparent;
     box-shadow: none;
   }
 }
@@ -1186,10 +1187,10 @@ body {
 .card {
   box-sizing: border-box;
   padding: 4mm;
-  margin: 1.5mm;
+  margin: 0;
   position: relative;
-  width: calc(100% - 3mm);
-  height: calc(100% - 3mm);
+  width: 100%;
+  height: 100%;
 }
 
 .card-inner {
@@ -1571,10 +1572,7 @@ function fitPreviewToWidth() {
     state.mmToPx = computeMmToPx();
   }
   const pageWidthPx = state.previewBaseWidth || 297 * state.mmToPx;
-  const viewportStyles = getComputedStyle(elements.previewViewport);
-  const paddingX =
-    parseFloat(viewportStyles.paddingLeft) + parseFloat(viewportStyles.paddingRight);
-  const viewportWidth = elements.previewViewport.clientWidth - paddingX;
+  const viewportWidth = elements.previewViewport.clientWidth;
   const scale = clamp(
     (viewportWidth / pageWidthPx) * 100,
     PREVIEW_SCALE_MIN,
