@@ -675,6 +675,9 @@ function bindSettingsEvents() {
     input.addEventListener("input", () => {
       updateSettingsFromInputs();
       syncConditionalFields();
+      if (state.project.mode === "text") {
+        updateEditorFont();
+      }
       setDirty(true);
       schedulePreview();
     });
@@ -879,11 +882,15 @@ function refreshEditorTheme(theme) {
   if (!editor) {
     return;
   }
-  const desiredSkin = getEditorThemeConfig(theme).skin;
-  if (editor.settings.skin === desiredSkin) {
+  const themeConfig = getEditorThemeConfig(theme);
+  const currentSkin = editor.settings?.skin;
+  const currentContentCss = editor.settings?.content_css;
+  if (currentSkin === themeConfig.skin && currentContentCss === themeConfig.content_css) {
     return;
   }
-  const content = editor.getContent({ format: "html" });
+  const content = editor.initialized
+    ? editor.getContent({ format: "html" })
+    : state.project.textHtml || "";
   editor.remove();
   state.editorReady = false;
   tinymce.init(buildEditorConfig(content, theme));
@@ -1546,9 +1553,9 @@ function renderPreview() {
 function applyPreviewScale(scaleValue) {
   const scale = clamp(Number(scaleValue) || 100, 60, 140) / 100;
   elements.previewScaleValue.textContent = `${Math.round(scale * 100)}%`;
-  elements.previewFrame.style.transform = `scale(${scale})`;
-  elements.previewFrame.style.width = `${100 / scale}%`;
-  elements.previewFrame.style.height = `${100 / scale}%`;
+  elements.previewFrame.style.transform = "none";
+  elements.previewFrame.style.width = `${scale * 100}%`;
+  elements.previewFrame.style.height = `${scale * 100}%`;
 }
 
 function fitPreviewToWidth() {
