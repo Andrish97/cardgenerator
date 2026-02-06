@@ -5,6 +5,7 @@ const FONT_PT_MIN = 8;
 const FONT_PT_MAX = 60;
 const CARD_INNER_WIDTH_MM = 64;
 const CARD_TEXT_HEIGHT_MM = 44;
+const THEME_STORAGE_KEY = "cardgenerator-theme";
 
 const state = {
   project: createDefaultProject(),
@@ -72,6 +73,7 @@ const elements = {
   previewViewport: document.querySelector(".preview-viewport"),
   previewPanel: document.querySelector(".preview"),
   mobilePreviewToggle: document.getElementById("mobile-preview-toggle"),
+  themeToggle: document.getElementById("theme-toggle"),
 };
 
 function createDefaultSettings() {
@@ -353,11 +355,18 @@ const STYLE_PRESETS = [
 
 function createDefaultProject() {
   return {
-    version: 1,
+    version: 2,
     mode: "text",
     textHtml: "",
     images: [],
-    settings: createDefaultSettings(),
+    settingsByMode: {
+      text: createDefaultSettings(),
+      image: createDefaultSettings(),
+    },
+    stylePresetByMode: {
+      text: "custom",
+      image: "custom",
+    },
   };
 }
 
@@ -368,6 +377,18 @@ function setDirty(isDirty) {
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
+}
+
+function getSettingsForMode(mode = state.project.mode) {
+  return state.project.settingsByMode[mode];
+}
+
+function setSettingsForMode(mode, settings) {
+  state.project.settingsByMode[mode] = settings;
+}
+
+function getStylePresetForMode(mode = state.project.mode) {
+  return state.project.stylePresetByMode[mode] || "custom";
 }
 
 function schedulePreview() {
@@ -384,12 +405,14 @@ function switchTab(tab) {
   elements.tabText.classList.toggle("hidden", tab !== "text");
   elements.tabImage.classList.toggle("hidden", tab !== "image");
   state.project.mode = tab;
+  elements.stylePreset.value = getStylePresetForMode(tab);
+  applySettingsToInputs(getSettingsForMode(tab));
   setDirty(true);
   schedulePreview();
 }
 
 function updateSettingsFromInputs() {
-  const settings = state.project.settings;
+  const settings = getSettingsForMode();
   settings.textColorHex = elements.textColor.value;
   settings.textShadowEnabled = elements.textShadow.checked;
   settings.fontGoogleEnabled = elements.fontGoogleEnabled.checked;
@@ -423,8 +446,7 @@ function updateSettingsFromInputs() {
   settings.showCutLines = elements.showCutLines.checked;
 }
 
-function applySettingsToInputs() {
-  const settings = state.project.settings;
+function applySettingsToInputs(settings = getSettingsForMode()) {
   elements.textColor.value = settings.textColorHex;
   elements.textShadow.checked = settings.textShadowEnabled;
   elements.fontName.value = settings.fontName;
@@ -452,7 +474,7 @@ function applySettingsToInputs() {
   elements.imageRadius.value = settings.imageRadiusMm;
   elements.showCutLines.checked = settings.showCutLines;
   updateFontSizeModeUI();
-  updateFontStatus("");
+  refreshFontStatus();
   updateTextFitWarning("");
   syncConditionalFields();
 }
@@ -485,6 +507,31 @@ function updateTextFitWarning(message) {
   elements.textFitWarning.textContent = message;
 }
 
+function refreshFontStatus() {
+  const settings = getSettingsForMode();
+  if (!settings.fontGoogleEnabled) {
+    updateFontStatus("Używana czcionka systemowa.");
+    return;
+  }
+  if (!settings.fontGoogleName) {
+    updateFontStatus("Wprowadź nazwę Google Font.");
+    return;
+  }
+  if (state.loadedGoogleFonts.has(settings.fontGoogleName)) {
+    updateFontStatus(`Wczytano Google Font: ${settings.fontGoogleName}`);
+    return;
+  }
+  updateFontStatus("Sprawdzam Google Fonts...");
+  loadGoogleFont(settings.fontGoogleName).then((loaded) => {
+    updateFontStatus(
+      loaded
+        ? `Wczytano Google Font: ${settings.fontGoogleName}`
+        : `Nie znaleziono Google Font: ${settings.fontGoogleName}`
+    );
+    schedulePreview();
+  });
+}
+
 function toggleFields(fields, isVisible) {
   fields.forEach((field) => {
     field.classList.toggle("is-hidden", !isVisible);
@@ -498,7 +545,7 @@ function toggleDisabled(fields, isDisabled) {
 }
 
 function syncConditionalFields() {
-  const settings = state.project.settings;
+  const settings = getSettingsForMode();
   const bgMode = settings.cardBackgroundMode;
   toggleFields(elements.bgColorFields, bgMode === "color");
   toggleFields(elements.bgGradientFields, bgMode === "gradient");
@@ -519,26 +566,30 @@ async function loadGoogleFont(name) {
     return true;
   }
   const urlName = name.trim().replace(/\s+/g, "+");
-  const href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(urlName)}:wght@400;700&display=swap`;
-  const response = await fetch(href);
-  if (!response.ok) {
+  const href = `https://fonts.googleapis.com/css2?family=${urlName}:wght@400;700&display=swap`;
+  try {
+    const response = await fetch(href);
+    if (!response.ok) {
+      return false;
+    }
+    const cssText = await response.text();
+    if (!cssText.includes("@font-face")) {
+      return false;
+    }
+    let link = document.getElementById("google-font-link");
+    if (!link) {
+      link = document.createElement("link");
+      link.id = "google-font-link";
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+    link.href = href;
+    await document.fonts.load(`1em "${name}"`);
+    state.loadedGoogleFonts.add(name);
+    return true;
+  } catch (error) {
     return false;
   }
-  const cssText = await response.text();
-  if (!cssText.includes("@font-face")) {
-    return false;
-  }
-  let link = document.getElementById("google-font-link");
-  if (!link) {
-    link = document.createElement("link");
-    link.id = "google-font-link";
-    link.rel = "stylesheet";
-    document.head.appendChild(link);
-  }
-  link.href = href;
-  await document.fonts.load(`1em "${name}"`);
-  state.loadedGoogleFonts.add(name);
-  return true;
 }
 
 function setupTabs() {
@@ -666,6 +717,16 @@ function normalizeSettings(settings = {}) {
   return normalized;
 }
 
+function getFontFamily(settings) {
+  const hasGoogleFont =
+    settings.fontGoogleEnabled &&
+    settings.fontGoogleName &&
+    state.loadedGoogleFonts.has(settings.fontGoogleName);
+  return hasGoogleFont
+    ? `"${settings.fontGoogleName}", "${settings.fontName}", serif`
+    : `"${settings.fontName}", serif`;
+}
+
 function computeAutoFontPt(itemsHtml, settings) {
   if (!itemsHtml.length) {
     return 28;
@@ -683,7 +744,7 @@ function computeAutoFontPt(itemsHtml, settings) {
   measure.style.width = `${width}px`;
   measure.style.height = `${height}px`;
   measure.style.padding = "0";
-  measure.style.fontFamily = settings.fontName;
+  measure.style.fontFamily = getFontFamily(settings);
   measure.style.fontSize = "28pt";
   measure.style.lineHeight = "1.1";
   measure.style.wordBreak = "normal";
@@ -736,11 +797,7 @@ function checkTextFits(itemsHtml, settings, fontPt) {
   measure.style.width = `${width}px`;
   measure.style.height = `${height}px`;
   measure.style.padding = "0";
-  const fontFamily =
-    settings.fontGoogleEnabled && settings.fontGoogleName && state.loadedGoogleFonts.has(settings.fontGoogleName)
-      ? `"${settings.fontGoogleName}", "${settings.fontName}", serif`
-      : `"${settings.fontName}", serif`;
-  measure.style.fontFamily = fontFamily;
+  measure.style.fontFamily = getFontFamily(settings);
   measure.style.fontSize = `${fontPt}pt`;
   measure.style.lineHeight = "1.1";
   measure.style.wordBreak = "normal";
@@ -760,13 +817,7 @@ function checkTextFits(itemsHtml, settings, fontPt) {
 }
 
 function buildCss(settings, fontPt) {
-  const hasGoogleFont =
-    settings.fontGoogleEnabled &&
-    settings.fontGoogleName &&
-    state.loadedGoogleFonts.has(settings.fontGoogleName);
-  const fontFamily = hasGoogleFont
-    ? `"${settings.fontGoogleName}", "${settings.fontName}", serif`
-    : `"${settings.fontName}", serif`;
+  const fontFamily = getFontFamily(settings);
   const textShadowCss = settings.textShadowEnabled
     ? "text-shadow: 0 0.4mm 0.8mm rgba(0,0,0,0.35);"
     : "text-shadow: none;";
@@ -962,14 +1013,14 @@ body {
   max-height: 100%;
   overflow: hidden;
   word-break: normal;
-  overflow-wrap: normal;
+  overflow-wrap: anywhere;
   padding: 0 1.2mm;
+  max-width: 100%;
 }
 
 .text-card .question {
-  white-space: nowrap;
-  display: inline-block;
-  margin-left: 0.6mm;
+  display: inline;
+  margin-left: 0.4mm;
 }
 
 .image-card .header {
@@ -1016,7 +1067,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  border-radius: inherit;
+  border-radius: ${settings.imageRadiusMm}mm;
 }
 `;
 
@@ -1200,7 +1251,7 @@ function buildImagePages(images, settings) {
 }
 
 function renderPreview() {
-  const settings = state.project.settings;
+  const settings = getSettingsForMode();
   let body = "";
   let fontPt = settings.fontSizePtFixed;
 
@@ -1350,8 +1401,8 @@ function handleNewProject() {
     return;
   }
   state.project = createDefaultProject();
-  applySettingsToInputs();
-  elements.stylePreset.value = "custom";
+  elements.stylePreset.value = getStylePresetForMode();
+  applySettingsToInputs(getSettingsForMode());
   renderImageList();
   if (state.editorReady) {
     const editor = tinymce.get("text-editor");
@@ -1371,6 +1422,7 @@ function handleSaveProject() {
       state.project.textHtml = editor.getContent({ format: "html" });
     }
   }
+  state.project.version = 2;
   const blob = new Blob([JSON.stringify(state.project, null, 2)], {
     type: "application/json",
   });
@@ -1388,18 +1440,33 @@ function handleLoadProject(file) {
   reader.onload = () => {
     try {
       const data = JSON.parse(reader.result);
-      if (!data || data.version !== 1) {
+      if (!data || (data.version !== 1 && data.version !== 2)) {
         throw new Error("Nieobsługiwany format projektu.");
       }
+      const legacySettings = data.settings ? normalizeSettings(data.settings) : null;
+      const settingsByMode = data.settingsByMode || {};
+      const normalizedTextSettings = normalizeSettings(
+        settingsByMode.text || legacySettings || createDefaultSettings()
+      );
+      const normalizedImageSettings = normalizeSettings(
+        settingsByMode.image || legacySettings || createDefaultSettings()
+      );
       state.project = {
-        version: 1,
+        version: 2,
         mode: data.mode === "image" ? "image" : "text",
         textHtml: data.textHtml || "",
         images: Array.isArray(data.images) ? data.images : [],
-        settings: normalizeSettings(data.settings),
+        settingsByMode: {
+          text: normalizedTextSettings,
+          image: normalizedImageSettings,
+        },
+        stylePresetByMode: {
+          text: data.stylePresetByMode?.text || "custom",
+          image: data.stylePresetByMode?.image || "custom",
+        },
       };
-      applySettingsToInputs();
-      elements.stylePreset.value = "custom";
+      elements.stylePreset.value = getStylePresetForMode(state.project.mode);
+      applySettingsToInputs(getSettingsForMode());
       renderImageList();
       if (state.editorReady) {
         const editor = tinymce.get("text-editor");
@@ -1409,16 +1476,7 @@ function handleLoadProject(file) {
       }
       switchTab(state.project.mode);
       setDirty(false);
-      if (state.project.settings.fontGoogleEnabled && state.project.settings.fontGoogleName) {
-        loadGoogleFont(state.project.settings.fontGoogleName).then((loaded) => {
-          updateFontStatus(
-            loaded
-              ? `Wczytano Google Font: ${state.project.settings.fontGoogleName}`
-              : `Nie znaleziono Google Font: ${state.project.settings.fontGoogleName}`
-          );
-          schedulePreview();
-        });
-      }
+      refreshFontStatus();
       schedulePreview();
     } catch (error) {
       window.alert(`Nie udało się wczytać projektu: ${error.message}`);
@@ -1429,7 +1487,7 @@ function handleLoadProject(file) {
 
 function handlePrint() {
   renderPreview();
-  const settings = state.project.settings;
+  const settings = getSettingsForMode();
   let body = "";
   let fontPt = settings.fontSizePtFixed;
 
@@ -1499,50 +1557,20 @@ function setupFontControls() {
   });
 
   elements.fontName.addEventListener("change", () => {
-    updateFontStatus("Używana czcionka systemowa.");
+    refreshFontStatus();
     schedulePreview();
   });
 
   elements.fontGoogleEnabled.addEventListener("change", () => {
     updateSettingsFromInputs();
     syncConditionalFields();
-    if (!state.project.settings.fontGoogleEnabled) {
-      updateFontStatus("Używana czcionka systemowa.");
-      schedulePreview();
-      return;
-    }
-    if (state.project.settings.fontGoogleName) {
-      updateFontStatus("Sprawdzam Google Fonts...");
-      loadGoogleFont(state.project.settings.fontGoogleName).then((loaded) => {
-        updateFontStatus(
-          loaded
-            ? `Wczytano Google Font: ${state.project.settings.fontGoogleName}`
-            : `Nie znaleziono Google Font: ${state.project.settings.fontGoogleName}`
-        );
-        schedulePreview();
-      });
-    }
+    refreshFontStatus();
+    schedulePreview();
   });
 
   elements.fontGoogle.addEventListener("change", async () => {
     updateSettingsFromInputs();
-    if (!state.project.settings.fontGoogleEnabled) {
-      updateFontStatus("Używana czcionka systemowa.");
-      schedulePreview();
-      return;
-    }
-    if (!state.project.settings.fontGoogleName) {
-      updateFontStatus("Używana czcionka systemowa.");
-      schedulePreview();
-      return;
-    }
-    updateFontStatus("Sprawdzam Google Fonts...");
-    const loaded = await loadGoogleFont(state.project.settings.fontGoogleName);
-    updateFontStatus(
-      loaded
-        ? `Wczytano Google Font: ${state.project.settings.fontGoogleName}`
-        : `Nie znaleziono Google Font: ${state.project.settings.fontGoogleName}`
-    );
+    refreshFontStatus();
     schedulePreview();
   });
 }
@@ -1560,22 +1588,29 @@ function setupStylePresets() {
     elements.stylePreset.appendChild(option);
   });
   elements.stylePreset.addEventListener("change", () => {
+    if (elements.stylePreset.value === "custom") {
+      state.project.stylePresetByMode[state.project.mode] = "custom";
+      setDirty(true);
+      return;
+    }
     const preset = STYLE_PRESETS.find((item) => item.id === elements.stylePreset.value);
     if (!preset) {
       return;
     }
-    state.project.settings = {
-      ...state.project.settings,
+    const currentSettings = getSettingsForMode();
+    setSettingsForMode(state.project.mode, {
+      ...currentSettings,
       ...preset.settings,
-    };
-    state.project.settings.fontGoogleEnabled = false;
-    state.project.settings.fontGoogleName = "";
-    applySettingsToInputs();
+      fontGoogleEnabled: false,
+      fontGoogleName: "",
+    });
+    state.project.stylePresetByMode[state.project.mode] = elements.stylePreset.value;
+    applySettingsToInputs(getSettingsForMode());
     syncConditionalFields();
     setDirty(true);
     schedulePreview();
   });
-  elements.stylePreset.value = "custom";
+  elements.stylePreset.value = getStylePresetForMode();
 }
 
 function setupPreviewControls() {
@@ -1596,7 +1631,29 @@ function setupPreviewControls() {
   });
 }
 
+function applyTheme(theme) {
+  document.body.classList.toggle("theme-dark", theme === "dark");
+  if (elements.themeToggle) {
+    elements.themeToggle.checked = theme === "dark";
+  }
+}
+
+function setupThemeToggle() {
+  if (!elements.themeToggle) {
+    return;
+  }
+  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  const initialTheme = storedTheme === "dark" ? "dark" : "light";
+  applyTheme(initialTheme);
+  elements.themeToggle.addEventListener("change", (event) => {
+    const theme = event.target.checked ? "dark" : "light";
+    applyTheme(theme);
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  });
+}
+
 function init() {
+  setupThemeToggle();
   applySettingsToInputs();
   bindSettingsEvents();
   setupTabs();
@@ -1609,18 +1666,7 @@ function init() {
   setupProjectControls();
   renderImageList();
   syncConditionalFields();
-  if (state.project.settings.fontGoogleEnabled && state.project.settings.fontGoogleName) {
-    loadGoogleFont(state.project.settings.fontGoogleName).then((loaded) => {
-      updateFontStatus(
-        loaded
-          ? `Wczytano Google Font: ${state.project.settings.fontGoogleName}`
-          : `Nie znaleziono Google Font: ${state.project.settings.fontGoogleName}`
-      );
-      schedulePreview();
-    });
-  } else {
-    updateFontStatus("Używana czcionka systemowa.");
-  }
+  refreshFontStatus();
   schedulePreview();
 }
 
