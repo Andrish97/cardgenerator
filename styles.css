@@ -422,12 +422,9 @@ body {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   background: var(--color-preview-bg);
-  padding: 24px 0 0 24px;
+  padding: 0;
   min-height: 0;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  position: relative;
   cursor: grab;
   user-select: none;
   -webkit-user-select: none;
@@ -456,33 +453,10 @@ body {
   height: 100%;
   min-height: 0;
   border: none;
-  background: var(--color-panel);
-  transform-origin: top center;
+  background: transparent;
+  transform-origin: top left;
   flex: 0 0 auto;
   pointer-events: none;
-}
-
-.preview-ruler {
-  position: absolute;
-  z-index: 3;
-  pointer-events: none;
-  background-color: color-mix(in srgb, var(--color-panel-muted) 70%, transparent);
-}
-
-.preview-ruler--top {
-  top: 0;
-  left: 24px;
-  right: 0;
-  height: 24px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.preview-ruler--left {
-  top: 24px;
-  left: 0;
-  bottom: 0;
-  width: 24px;
-  border-right: 1px solid var(--color-border);
 }
 
 .measure-box {
