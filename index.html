@@ -76,6 +76,7 @@
             <button class="settings-tab" data-settings-tab="border" type="button">Obramowanie</button>
             <button class="settings-tab" data-settings-tab="line" type="button">Linia</button>
             <button class="settings-tab" data-settings-tab="effects" type="button">Efekty</button>
+            <button class="settings-tab" data-settings-tab="page" type="button">Strona</button>
           </div>
 
           <div class="settings-card">
@@ -249,6 +250,59 @@
                   <input id="show-cutlines" type="checkbox" />
                   Linie cięcia
                 </label>
+                <label class="checkbox">
+                  <input id="show-card-boundaries" type="checkbox" />
+                  Granice kart
+                </label>
+              </div>
+            </div>
+
+            <div class="settings-tab-content hidden" data-settings-panel="page">
+              <div class="settings-grid">
+                <label>
+                  Format papieru
+                  <select id="paper-size-preset">
+                    <option value="A4-landscape">A4 poziomo (297×210 mm)</option>
+                    <option value="A4-portrait">A4 pionowo (210×297 mm)</option>
+                    <option value="A3-landscape">A3 poziomo (420×297 mm)</option>
+                    <option value="A3-portrait">A3 pionowo (297×420 mm)</option>
+                    <option value="Letter-landscape">Letter poziomo (279×216 mm)</option>
+                    <option value="Letter-portrait">Letter pionowo (216×279 mm)</option>
+                    <option value="custom">Własny</option>
+                  </select>
+                </label>
+                <label>
+                  Szerokość papieru (mm)
+                  <input id="paper-width" type="number" min="50" max="1000" step="1" />
+                </label>
+                <label>
+                  Wysokość papieru (mm)
+                  <input id="paper-height" type="number" min="50" max="1000" step="1" />
+                </label>
+                <label>
+                  Margines strony (mm)
+                  <input id="page-margin" type="number" min="0" max="40" step="0.5" />
+                </label>
+                <label>
+                  Szerokość karty (mm)
+                  <input id="card-width" type="number" min="20" max="250" step="0.5" />
+                </label>
+                <label>
+                  Wysokość karty (mm)
+                  <input id="card-height" type="number" min="20" max="250" step="0.5" />
+                </label>
+                <label>
+                  Margines obwódki (mm)
+                  <input id="card-border-inset" type="number" min="0" max="20" step="0.5" />
+                </label>
+                <label>
+                  Odstęp kart poziomy (mm)
+                  <input id="card-gap-x" type="number" min="0" max="40" step="0.5" />
+                </label>
+                <label>
+                  Odstęp kart pionowy (mm)
+                  <input id="card-gap-y" type="number" min="0" max="40" step="0.5" />
+                </label>
               </div>
             </div>
           </div>
@@ -261,13 +315,15 @@
           <div class="preview-controls">
             <label>
               Skala
-              <input id="preview-scale" type="range" min="50" max="180" value="100" />
+              <input id="preview-scale" type="range" min="50" max="220" value="100" />
             </label>
             <span id="preview-scale-value">100%</span>
             <button id="preview-fit" type="button">Dopasuj</button>
           </div>
         </div>
         <div class="preview-viewport">
+          <div id="preview-ruler-top" class="preview-ruler preview-ruler--top" aria-hidden="true"></div>
+          <div id="preview-ruler-left" class="preview-ruler preview-ruler--left" aria-hidden="true"></div>
           <iframe id="preview-frame" title="Podgląd kart"></iframe>
         </div>
       </section>

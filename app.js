@@ -1,13 +1,17 @@
-const COLS = 4;
-const ROWS = 2;
-const SLOTS_PER_PAGE = COLS * ROWS;
 const FONT_PT_MIN = 8;
 const FONT_PT_MAX = 60;
-const CARD_INNER_WIDTH_MM = 64;
-const CARD_TEXT_HEIGHT_MM = 44;
 const THEME_STORAGE_KEY = "cardgenerator-theme";
 const PREVIEW_SCALE_MIN = 50;
-const PREVIEW_SCALE_MAX = 180;
+const PREVIEW_SCALE_MAX = 220;
+
+const PAPER_PRESETS = {
+  "A4-landscape": { widthMm: 297, heightMm: 210 },
+  "A4-portrait": { widthMm: 210, heightMm: 297 },
+  "A3-landscape": { widthMm: 420, heightMm: 297 },
+  "A3-portrait": { widthMm: 297, heightMm: 420 },
+  "Letter-landscape": { widthMm: 279, heightMm: 216 },
+  "Letter-portrait": { widthMm: 216, heightMm: 279 },
+};
 
 const state = {
   project: createDefaultProject(),
@@ -65,6 +69,16 @@ const elements = {
   imageRadius: document.getElementById("image-radius"),
   imageShadowEnabled: document.getElementById("image-shadow-enabled"),
   showCutLines: document.getElementById("show-cutlines"),
+  showCardBoundaries: document.getElementById("show-card-boundaries"),
+  paperSizePreset: document.getElementById("paper-size-preset"),
+  paperWidth: document.getElementById("paper-width"),
+  paperHeight: document.getElementById("paper-height"),
+  pageMargin: document.getElementById("page-margin"),
+  cardWidth: document.getElementById("card-width"),
+  cardHeight: document.getElementById("card-height"),
+  cardBorderInset: document.getElementById("card-border-inset"),
+  cardGapX: document.getElementById("card-gap-x"),
+  cardGapY: document.getElementById("card-gap-y"),
   bgColorFields: document.querySelectorAll(".field-bg-color"),
   bgGradientFields: document.querySelectorAll(".field-bg-gradient"),
   borderFields: document.querySelectorAll(".field-border"),
@@ -80,6 +94,8 @@ const elements = {
   previewScaleValue: document.getElementById("preview-scale-value"),
   previewFit: document.getElementById("preview-fit"),
   previewViewport: document.querySelector(".preview-viewport"),
+  previewRulerTop: document.getElementById("preview-ruler-top"),
+  previewRulerLeft: document.getElementById("preview-ruler-left"),
   previewPanel: document.querySelector(".preview"),
   mobilePreviewToggle: document.getElementById("mobile-preview-toggle"),
   themeToggle: document.getElementById("theme-toggle"),
@@ -115,6 +131,16 @@ function createDefaultSettings() {
     imageRadiusMm: 3,
     imageShadowEnabled: false,
     showCutLines: false,
+    showCardBoundaries: false,
+    paperSizePreset: "A4-landscape",
+    paperWidthMm: 297,
+    paperHeightMm: 210,
+    pageMarginMm: 0,
+    cardWidthMm: 74.25,
+    cardHeightMm: 105,
+    cardBorderInsetMm: 7,
+    cardGapXmm: 0,
+    cardGapYmm: 0,
   };
 }
 
@@ -539,7 +565,7 @@ const STYLE_PRESETS = [
 
 function createDefaultProject() {
   return {
-    version: 2,
+    version: 3,
     mode: "text",
     textHtml: "",
     images: [],
@@ -630,6 +656,16 @@ function updateSettingsFromInputs() {
   settings.imageRadiusMm = clamp(Number(elements.imageRadius.value) || 0, 0, 10);
   settings.imageShadowEnabled = elements.imageShadowEnabled.checked;
   settings.showCutLines = elements.showCutLines.checked;
+  settings.showCardBoundaries = elements.showCardBoundaries.checked;
+  settings.paperSizePreset = elements.paperSizePreset.value;
+  settings.paperWidthMm = clamp(Number(elements.paperWidth.value) || 297, 50, 1000);
+  settings.paperHeightMm = clamp(Number(elements.paperHeight.value) || 210, 50, 1000);
+  settings.pageMarginMm = clamp(Number(elements.pageMargin.value) || 0, 0, 40);
+  settings.cardWidthMm = clamp(Number(elements.cardWidth.value) || 74.25, 20, 250);
+  settings.cardHeightMm = clamp(Number(elements.cardHeight.value) || 105, 20, 250);
+  settings.cardBorderInsetMm = clamp(Number(elements.cardBorderInset.value) || 0, 0, 20);
+  settings.cardGapXmm = clamp(Number(elements.cardGapX.value) || 0, 0, 40);
+  settings.cardGapYmm = clamp(Number(elements.cardGapY.value) || 0, 0, 40);
 }
 
 function applySettingsToInputs(settings = getSettingsForMode()) {
@@ -661,6 +697,17 @@ function applySettingsToInputs(settings = getSettingsForMode()) {
   elements.imageRadius.value = settings.imageRadiusMm;
   elements.imageShadowEnabled.checked = settings.imageShadowEnabled;
   elements.showCutLines.checked = settings.showCutLines;
+  elements.showCardBoundaries.checked = Boolean(settings.showCardBoundaries);
+  elements.paperSizePreset.value = settings.paperSizePreset || detectPaperPreset(settings.paperWidthMm, settings.paperHeightMm);
+  updatePaperSizeInputsState();
+  elements.paperWidth.value = settings.paperWidthMm;
+  elements.paperHeight.value = settings.paperHeightMm;
+  elements.pageMargin.value = settings.pageMarginMm;
+  elements.cardWidth.value = settings.cardWidthMm;
+  elements.cardHeight.value = settings.cardHeightMm;
+  elements.cardBorderInset.value = settings.cardBorderInsetMm;
+  elements.cardGapX.value = settings.cardGapXmm;
+  elements.cardGapY.value = settings.cardGapYmm;
   updateFontSizeModeUI();
   refreshFontStatus();
   updateTextFitWarning("");
@@ -672,12 +719,13 @@ function applySettingsToInputs(settings = getSettingsForMode()) {
 
 function bindSettingsEvents() {
   const inputs = document.querySelectorAll(
-    "#text-color, #text-shadow, #font-name, #font-google, #font-size-mode, #font-size-fixed, #card-bg-mode, #card-bg-color, #card-bg-gradient-type, #card-bg-gradient-direction, #card-bg-grad-1, #card-bg-grad-2, #card-border-enabled, #card-border-color, #card-border-width, #card-border-style, #card-line-enabled, #card-line-color, #card-line-width, #card-line-style, #card-shadow-enabled, #card-rounded-enabled, #card-radius, #image-rounded-enabled, #image-radius, #image-shadow-enabled, #show-cutlines"
+    "#text-color, #text-shadow, #font-name, #font-google, #font-size-mode, #font-size-fixed, #card-bg-mode, #card-bg-color, #card-bg-gradient-type, #card-bg-gradient-direction, #card-bg-grad-1, #card-bg-grad-2, #card-border-enabled, #card-border-color, #card-border-width, #card-border-style, #card-line-enabled, #card-line-color, #card-line-width, #card-line-style, #card-shadow-enabled, #card-rounded-enabled, #card-radius, #image-rounded-enabled, #image-radius, #image-shadow-enabled, #show-cutlines, #show-card-boundaries, #paper-size-preset, #paper-width, #paper-height, #page-margin, #card-width, #card-height, #card-border-inset, #card-gap-x, #card-gap-y"
   );
 
   inputs.forEach((input) => {
     input.addEventListener("input", () => {
-      updateSettingsFromInputs();
+      updatePaperSizeInputsState();
+    updateSettingsFromInputs();
       syncConditionalFields();
       if (state.project.mode === "text") {
         updateEditorFont();
@@ -941,15 +989,24 @@ function stripHtml(html) {
   return div.textContent || div.innerText || "";
 }
 
-function computeMmToPx() {
-  const test = document.createElement("div");
-  test.style.width = "100mm";
-  test.style.position = "absolute";
-  test.style.visibility = "hidden";
-  document.body.appendChild(test);
-  const px = test.offsetWidth / 100;
-  document.body.removeChild(test);
+function measurePxPerCssCm() {
+  const el = document.createElement("div");
+  el.style.cssText = "position:absolute;visibility:hidden;width:1cm;height:1cm;";
+  document.body.appendChild(el);
+  const px = el.getBoundingClientRect().width;
+  el.remove();
   return px;
+}
+
+function cmToPx(cm) {
+  if (!state.mmToPx) {
+    state.mmToPx = measurePxPerCssCm() / 10;
+  }
+  return cm * state.mmToPx * 10;
+}
+
+function computeMmToPx() {
+  return cmToPx(1) / 10;
 }
 
 function pxToMm(valuePx) {
@@ -957,6 +1014,43 @@ function pxToMm(valuePx) {
     state.mmToPx = computeMmToPx();
   }
   return Math.round((Number(valuePx) / state.mmToPx) * 100) / 100;
+}
+
+function detectPaperPreset(widthMm, heightMm) {
+  const epsilon = 0.01;
+  const found = Object.entries(PAPER_PRESETS).find(
+    ([, paper]) =>
+      Math.abs(paper.widthMm - Number(widthMm)) < epsilon &&
+      Math.abs(paper.heightMm - Number(heightMm)) < epsilon
+  );
+  return found ? found[0] : "custom";
+}
+
+function resolvePageLayout(settings) {
+  const paperWidthMm = clamp(Number(settings.paperWidthMm) || 297, 50, 1000);
+  const paperHeightMm = clamp(Number(settings.paperHeightMm) || 210, 50, 1000);
+  const pageMarginMm = clamp(Number(settings.pageMarginMm) || 0, 0, 40);
+  const cardWidthMm = clamp(Number(settings.cardWidthMm) || 74.25, 20, 250);
+  const cardHeightMm = clamp(Number(settings.cardHeightMm) || 105, 20, 250);
+  const cardGapXmm = clamp(Number(settings.cardGapXmm) || 0, 0, 40);
+  const cardGapYmm = clamp(Number(settings.cardGapYmm) || 0, 0, 40);
+
+  const innerWidth = Math.max(0, paperWidthMm - pageMarginMm * 2);
+  const innerHeight = Math.max(0, paperHeightMm - pageMarginMm * 2);
+  const cols = Math.max(1, Math.floor((innerWidth + cardGapXmm) / (cardWidthMm + cardGapXmm)));
+  const rows = Math.max(1, Math.floor((innerHeight + cardGapYmm) / (cardHeightMm + cardGapYmm)));
+  return {
+    paperWidthMm,
+    paperHeightMm,
+    pageMarginMm,
+    cardWidthMm,
+    cardHeightMm,
+    cardGapXmm,
+    cardGapYmm,
+    cols,
+    rows,
+    slotsPerPage: cols * rows,
+  };
 }
 
 function normalizeSettings(settings = {}) {
@@ -970,6 +1064,12 @@ function normalizeSettings(settings = {}) {
   if (settings.imageRadiusMm == null && settings.imageRadiusPx != null) {
     normalized.imageRadiusMm = pxToMm(settings.imageRadiusPx);
   }
+  normalized.showCardBoundaries = Boolean(normalized.showCardBoundaries);
+  if (normalized.paperSizePreset && normalized.paperSizePreset !== "custom" && PAPER_PRESETS[normalized.paperSizePreset]) {
+    normalized.paperWidthMm = PAPER_PRESETS[normalized.paperSizePreset].widthMm;
+    normalized.paperHeightMm = PAPER_PRESETS[normalized.paperSizePreset].heightMm;
+  }
+  normalized.paperSizePreset = detectPaperPreset(normalized.paperWidthMm, normalized.paperHeightMm);
   return normalized;
 }
 
@@ -991,8 +1091,8 @@ function computeAutoFontPt(itemsHtml, settings) {
     state.mmToPx = computeMmToPx();
   }
 
-  const width = CARD_INNER_WIDTH_MM * state.mmToPx * 0.95;
-  const height = CARD_TEXT_HEIGHT_MM * state.mmToPx * 0.9;
+  const width = Math.max((settings.cardWidthMm - settings.cardBorderInsetMm * 2) * state.mmToPx * 0.92, 10);
+  const height = Math.max(((settings.cardHeightMm / 2) - settings.cardBorderInsetMm * 2) * state.mmToPx * 0.9, 10);
 
   measure.style.width = `${width}px`;
   measure.style.height = `${height}px`;
@@ -1045,8 +1145,8 @@ function checkTextFits(itemsHtml, settings, fontPt) {
     state.mmToPx = computeMmToPx();
   }
 
-  const width = CARD_INNER_WIDTH_MM * state.mmToPx * 0.95;
-  const height = CARD_TEXT_HEIGHT_MM * state.mmToPx * 0.9;
+  const width = Math.max((settings.cardWidthMm - settings.cardBorderInsetMm * 2) * state.mmToPx * 0.92, 10);
+  const height = Math.max(((settings.cardHeightMm / 2) - settings.cardBorderInsetMm * 2) * state.mmToPx * 0.9, 10);
   measure.style.width = `${width}px`;
   measure.style.height = `${height}px`;
   measure.style.padding = "0";
@@ -1070,6 +1170,7 @@ function checkTextFits(itemsHtml, settings, fontPt) {
 }
 
 function buildCss(settings, fontPt) {
+  const layout = resolvePageLayout(settings);
   const fontFamily = getFontFamily(settings);
   const textShadowCss = settings.textShadowEnabled
     ? "text-shadow: 0 0.4mm 0.8mm rgba(0,0,0,0.35);"
@@ -1108,96 +1209,65 @@ function buildCss(settings, fontPt) {
   const shadowCss = settings.cardShadowEnabled
     ? "box-shadow: 0 2mm 4mm rgba(0,0,0,0.18);"
     : "box-shadow: none;";
-
   const radiusValue = settings.cardRoundedEnabled ? settings.cardRadiusMm : 0;
   const radiusCss = settings.cardRoundedEnabled
     ? `border-radius: ${radiusValue}mm; overflow: hidden;`
     : "border-radius: 0; overflow: visible;";
-
   const imageRadiusValue = settings.imageRoundedEnabled ? settings.imageRadiusMm : 0;
   const imageShadowCss = settings.imageShadowEnabled
     ? "box-shadow: 0 1.2mm 2.4mm rgba(0,0,0,0.25);"
     : "box-shadow: none;";
+  const cardBoundaryCss = settings.showCardBoundaries
+    ? "outline: 1px solid #d1d5db;"
+    : "outline: none;";
 
-  let css = `
+  return `
 @page {
-  size: A4 landscape;
+  size: ${layout.paperWidthMm}mm ${layout.paperHeightMm}mm;
   margin: 0;
 }
-
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
-
 body {
   font-family: ${fontFamily};
   background: #ffffff;
 }
-
+@media screen {
+  body { background: transparent; user-select: none; -webkit-user-select: none; margin: 0; }
+}
 .page {
   box-sizing: border-box;
-  width: 297mm;
-  height: 210mm;
+  width: ${layout.paperWidthMm}mm;
+  height: ${layout.paperHeightMm}mm;
   margin: 0 auto;
   background: white;
-  display: block;
   position: relative;
   page-break-after: always;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  display: grid;
+  grid-template-columns: repeat(${layout.cols}, ${layout.cardWidthMm}mm);
+  grid-auto-rows: ${layout.cardHeightMm}mm;
+  gap: ${layout.cardGapYmm}mm ${layout.cardGapXmm}mm;
+  padding: ${layout.pageMarginMm}mm;
+  align-content: start;
+  justify-content: start;
 }
-
 @media screen {
-  body {
-    background: transparent;
-    user-select: none;
-    -webkit-user-select: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6mm;
-    padding: 6mm 0;
-  }
-
-  .page {
-    margin: 0;
-    background: transparent;
-    box-shadow: none;
-  }
+  .page { box-shadow: none; }
 }
-
-.page-table {
-  border-collapse: collapse;
-  width: 100%;
-  height: 100%;
-  table-layout: fixed;
-}
-
-.page-table tr {
-  height: 50%;
-}
-
-.page-table td {
-  width: 25%;
-  padding: 0;
-  margin: 0;
-  vertical-align: top;
-}
-
 .card {
   box-sizing: border-box;
-  padding: 4mm;
+  width: ${layout.cardWidthMm}mm;
+  height: ${layout.cardHeightMm}mm;
+  padding: ${settings.cardBorderInsetMm}mm;
   margin: 0;
   position: relative;
-  width: 100%;
-  height: 100%;
+  ${cardBoundaryCss}
 }
-
 .card-inner {
   position: relative;
   width: 100%;
@@ -1210,7 +1280,6 @@ body {
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
-
 .card-line {
   position: absolute;
   left: 10%;
@@ -1221,39 +1290,11 @@ body {
   z-index: 10;
   pointer-events: none;
 }
-
-.half {
-  position: absolute;
-  left: 0;
-  right: 0;
-  box-sizing: border-box;
-  padding: 3mm;
-}
-
-.half.top {
-  top: 0;
-  bottom: 50%;
-}
-
-.half.bottom {
-  top: 50%;
-  bottom: 0;
-}
-
-.half-content {
-  display: table;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.half-content-inner {
-  display: table-cell;
-  vertical-align: middle;
-  text-align: center;
-  overflow: hidden;
-}
-
+.half { position: absolute; left: 0; right: 0; box-sizing: border-box; padding: 3mm; }
+.half.top { top: 0; bottom: 50%; }
+.half.bottom { top: 50%; bottom: 0; }
+.half-content { display: table; width: 100%; height: 100%; overflow: hidden; }
+.half-content-inner { display: table-cell; vertical-align: middle; text-align: center; overflow: hidden; }
 .text-card .header,
 .text-card .word {
   font-size: ${fontPt}pt;
@@ -1265,115 +1306,26 @@ body {
   text-align: center;
   ${textShadowCss}
 }
-
-.text-card .header {
-  margin-bottom: 2mm;
-  text-align: center;
-}
-
-.text-card span[data-block="1"] {
-  display: block;
-}
-
-.text-card .word {
-  max-height: 100%;
-  overflow: hidden;
-  word-break: normal;
-  overflow-wrap: anywhere;
-  padding: 0 1.2mm;
-  max-width: 100%;
-}
-
-.text-card .question {
-  display: inline;
-  margin-left: 0.4mm;
-}
-
+.text-card .header { margin-bottom: 2mm; }
+.text-card .word { max-height: 100%; overflow: hidden; overflow-wrap: anywhere; padding: 0 1.2mm; max-width: 100%; }
+.text-card .question { display: inline; margin-left: 0.4mm; }
 .image-card .header {
   font-size: ${fontPt}pt;
   line-height: 1.1;
   margin-bottom: 2mm;
   color: ${settings.textColorHex};
-  text-align: center;
   display: block;
   width: 100%;
   ${textShadowCss}
 }
-
-.image-card .half-content {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-
-.image-card .half-content-inner {
-  width: 100%;
-  height: 100%;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.image-card .img-box {
-  flex: 1 1 auto;
-  display: flex;
-  margin: 0 auto;
-  width: 100%;
-  min-height: 0;
-  box-sizing: border-box;
-  padding: 1mm;
-  overflow: visible;
-  align-items: center;
-  justify-content: center;
-}
-
-.image-card img {
-  display: block;
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-  border-radius: ${imageRadiusValue}mm;
-  ${imageShadowCss}
-}
+.image-card .half-content { width: 100%; height: 100%; display: block; }
+.image-card .half-content-inner { width: 100%; height: 100%; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; }
+.image-card .img-box { flex: 1 1 auto; display: flex; margin: 0 auto; width: 100%; min-height: 0; box-sizing: border-box; padding: 1mm; overflow: visible; align-items: center; justify-content: center; }
+.image-card img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; border-radius: ${imageRadiusValue}mm; ${imageShadowCss} }
+.cutlines { position: absolute; inset: ${layout.pageMarginMm}mm; pointer-events: none; z-index: 50; }
+.cutline-h { position: absolute; left: 0; right: 0; border-top: 1px dashed #999; }
+.cutline-v { position: absolute; top: 0; bottom: 0; border-left: 1px dashed #999; }
 `;
-
-  if (settings.showCutLines) {
-    css += `
-.cutlines {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 50;
-}
-
-.cutline-h {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  border-top: 1px dashed #999;
-}
-
-.cutline-v {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  border-left: 1px dashed #999;
-}
-
-.cutline-v.x1 { left: 25%; }
-.cutline-v.x2 { left: 50%; }
-.cutline-v.x3 { left: 75%; }
-`;
-  }
-
-  return css;
 }
 
 function buildFullHtml(css, body, settings) {
@@ -1381,147 +1333,80 @@ function buildFullHtml(css, body, settings) {
     settings.fontGoogleEnabled && settings.fontGoogleName
       ? `<link rel="stylesheet" href="${getGoogleFontHref(settings.fontGoogleName)}" />`
       : "";
-  return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Karty</title>
-  ${fontLink}
-  <style>${css}</style>
-</head>
-<body>
-${body}
-</body>
-</html>`;
+  return `<!DOCTYPE html><html><head><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge" /><title>Karty</title>${fontLink}<style>${css}</style></head><body>${body}</body></html>`;
 }
 
 function buildTextCard(topHtml, bottomHtml) {
-  return `<td>
-  <div class="card text-card">
-    <div class="card-inner">
-      <div class="card-line"></div>
-      <div class="half top">
-        <div class="half-content">
-          <div class="half-content-inner">
-            <div class="header">Ja mam</div>
-            <div class="word">${topHtml}</div>
-          </div>
-        </div>
-      </div>
-      <div class="half bottom">
-        <div class="half-content">
-          <div class="half-content-inner">
-            <div class="header">Kto ma</div>
-            <div class="word">${bottomHtml}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</td>`;
+  return `<div class="card text-card"><div class="card-inner"><div class="card-line"></div><div class="half top"><div class="half-content"><div class="half-content-inner"><div class="header">Ja mam</div><div class="word">${topHtml}</div></div></div></div><div class="half bottom"><div class="half-content"><div class="half-content-inner"><div class="header">Kto ma</div><div class="word">${bottomHtml}</div></div></div></div></div></div>`;
 }
 
 function buildImageCard(topSrc, bottomSrc) {
-  return `<td>
-  <div class="card image-card">
-    <div class="card-inner">
-      <div class="card-line"></div>
-      <div class="half top">
-        <div class="half-content">
-          <div class="half-content-inner">
-            <div class="header">Ja mam</div>
-            <div class="img-box">
-              <img src="${topSrc}" />
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="half bottom">
-        <div class="half-content">
-          <div class="half-content-inner">
-            <div class="header">Kto ma?</div>
-            <div class="img-box">
-              <img src="${bottomSrc}" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</td>`;
+  return `<div class="card image-card"><div class="card-inner"><div class="card-line"></div><div class="half top"><div class="half-content"><div class="half-content-inner"><div class="header">Ja mam</div><div class="img-box"><img src="${topSrc}" /></div></div></div></div><div class="half bottom"><div class="half-content"><div class="half-content-inner"><div class="header">Kto ma?</div><div class="img-box"><img src="${bottomSrc}" /></div></div></div></div></div></div>`;
 }
 
-function buildPage(cardsHtml, showCutLines) {
-  const cutlines = showCutLines
-    ? `<div class="cutlines">
-    <div class="cutline-h"></div>
-    <div class="cutline-v x1"></div>
-    <div class="cutline-v x2"></div>
-    <div class="cutline-v x3"></div>
-  </div>`
-    : "";
-
-  return `<div class="page">${cutlines}
-  <table class="page-table">
-    ${cardsHtml}
-  </table>
-</div>`;
+function buildPage(cardsHtml, layout, showCutLines) {
+  let cutlines = "";
+  if (showCutLines) {
+    const lines = [];
+    for (let col = 1; col < layout.cols; col += 1) {
+      const x = col * layout.cardWidthMm + (col - 0.5) * layout.cardGapXmm;
+      lines.push(`<div class="cutline-v" style="left:${x}mm;"></div>`);
+    }
+    for (let row = 1; row < layout.rows; row += 1) {
+      const y = row * layout.cardHeightMm + (row - 0.5) * layout.cardGapYmm;
+      lines.push(`<div class="cutline-h" style="top:${y}mm;"></div>`);
+    }
+    cutlines = `<div class="cutlines">${lines.join("")}</div>`;
+  }
+  return `<div class="page">${cutlines}${cardsHtml}</div>`;
 }
 
 function buildTextPages(itemsHtml, settings) {
   const pages = [];
   const n = itemsHtml.length;
-  const pageCount = Math.ceil(n / SLOTS_PER_PAGE);
+  const layout = resolvePageLayout(settings);
+  const pageCount = Math.ceil(n / layout.slotsPerPage);
 
   for (let p = 0; p < pageCount; p += 1) {
-    const start = p * SLOTS_PER_PAGE;
-    const rows = [];
-    for (let row = 0; row < ROWS; row += 1) {
-      const cells = [];
-      for (let col = 0; col < COLS; col += 1) {
-        const idx = start + row * COLS + col;
-        if (idx >= n) {
-          cells.push("<td></td>");
-          continue;
-        }
-        const top = itemsHtml[idx];
-        const bottomIndex = (idx + 1) % n;
-        const bottom = appendQuestionToItem(itemsHtml[bottomIndex]);
-        cells.push(buildTextCard(top, bottom));
+    const start = p * layout.slotsPerPage;
+    const cards = [];
+    for (let i = 0; i < layout.slotsPerPage; i += 1) {
+      const idx = start + i;
+      if (idx >= n) {
+        cards.push('<div class="card"></div>');
+        continue;
       }
-      rows.push(`<tr>${cells.join("")}</tr>`);
+      const top = itemsHtml[idx];
+      const bottom = appendQuestionToItem(itemsHtml[(idx + 1) % n]);
+      cards.push(buildTextCard(top, bottom));
     }
-    pages.push(buildPage(rows.join(""), settings.showCutLines));
+    pages.push(buildPage(cards.join(''), layout, settings.showCutLines));
   }
-  return pages.join("");
+  return pages.join('');
 }
 
 function buildImagePages(images, settings) {
   const pages = [];
   const n = images.length;
-  const pageCount = Math.ceil(n / SLOTS_PER_PAGE);
+  const layout = resolvePageLayout(settings);
+  const pageCount = Math.ceil(n / layout.slotsPerPage);
 
   for (let p = 0; p < pageCount; p += 1) {
-    const start = p * SLOTS_PER_PAGE;
-    const rows = [];
-    for (let row = 0; row < ROWS; row += 1) {
-      const cells = [];
-      for (let col = 0; col < COLS; col += 1) {
-        const idx = start + row * COLS + col;
-        if (idx >= n) {
-          cells.push("<td></td>");
-          continue;
-        }
-        const top = images[idx].dataUrl;
-        const bottom = images[(idx + 1) % n].dataUrl;
-        cells.push(buildImageCard(top, bottom));
+    const start = p * layout.slotsPerPage;
+    const cards = [];
+    for (let i = 0; i < layout.slotsPerPage; i += 1) {
+      const idx = start + i;
+      if (idx >= n) {
+        cards.push('<div class="card"></div>');
+        continue;
       }
-      rows.push(`<tr>${cells.join("")}</tr>`);
+      const top = images[idx].dataUrl;
+      const bottom = images[(idx + 1) % n].dataUrl;
+      cards.push(buildImageCard(top, bottom));
     }
-    pages.push(buildPage(rows.join(""), settings.showCutLines));
+    pages.push(buildPage(cards.join(''), layout, settings.showCutLines));
   }
-  return pages.join("");
+  return pages.join('');
 }
 
 function renderPreview() {
@@ -1570,14 +1455,16 @@ function applyPreviewScale(scaleValue) {
     clamp(Number(scaleValue) || 100, PREVIEW_SCALE_MIN, PREVIEW_SCALE_MAX) / 100;
   elements.previewScaleValue.textContent = `${Math.round(scale * 100)}%`;
   elements.previewFrame.style.transform = `scale(${scale})`;
+  updatePreviewRulers(scale);
 }
 
 function fitPreviewToWidth() {
   if (!state.mmToPx) {
     state.mmToPx = computeMmToPx();
   }
-  const pageWidthPx = state.previewBaseWidth || 297 * state.mmToPx;
-  const viewportWidth = elements.previewViewport.clientWidth;
+  const layout = resolvePageLayout(getSettingsForMode());
+  const pageWidthPx = state.previewBaseWidth || layout.paperWidthMm * state.mmToPx;
+  const viewportWidth = Math.max(0, elements.previewViewport.clientWidth - 28);
   const scale = clamp(
     (viewportWidth / pageWidthPx) * 100,
     PREVIEW_SCALE_MIN,
@@ -1720,7 +1607,7 @@ function handleSaveProject() {
       state.project.textHtml = editor.getContent({ format: "html" });
     }
   }
-  state.project.version = 2;
+  state.project.version = 3;
   const blob = new Blob([JSON.stringify(state.project, null, 2)], {
     type: "application/json",
   });
@@ -1738,7 +1625,7 @@ function handleLoadProject(file) {
   reader.onload = () => {
     try {
       const data = JSON.parse(reader.result);
-      if (!data || (data.version !== 1 && data.version !== 2)) {
+      if (!data || (data.version !== 1 && data.version !== 2 && data.version !== 3)) {
         throw new Error("Nieobsługiwany format projektu.");
       }
       const legacySettings = data.settings ? normalizeSettings(data.settings) : null;
@@ -1750,7 +1637,7 @@ function handleLoadProject(file) {
         settingsByMode.image || legacySettings || createDefaultSettings()
       );
       state.project = {
-        version: 2,
+        version: 3,
         mode: data.mode === "image" ? "image" : "text",
         textHtml: data.textHtml || "",
         images: Array.isArray(data.images) ? data.images : [],
@@ -1913,6 +1800,100 @@ function setupStylePresets() {
   elements.stylePreset.value = getStylePresetForMode();
 }
 
+
+
+function updatePaperSizeInputsState() {
+  const isCustom = elements.paperSizePreset.value === "custom";
+  elements.paperWidth.disabled = !isCustom;
+  elements.paperHeight.disabled = !isCustom;
+}
+function syncPaperPresetFromInputs() {
+  const settings = getSettingsForMode();
+  if (elements.paperSizePreset.value === "custom") {
+    settings.paperSizePreset = "custom";
+  } else {
+    settings.paperSizePreset = detectPaperPreset(settings.paperWidthMm, settings.paperHeightMm);
+  }
+  elements.paperSizePreset.value = settings.paperSizePreset;
+  updatePaperSizeInputsState();
+}
+
+function setupPageSettingsControls() {
+  if (!elements.paperSizePreset) {
+    return;
+  }
+  elements.paperSizePreset.addEventListener("change", () => {
+    const preset = elements.paperSizePreset.value;
+    if (preset !== "custom" && PAPER_PRESETS[preset]) {
+      elements.paperWidth.value = PAPER_PRESETS[preset].widthMm;
+      elements.paperHeight.value = PAPER_PRESETS[preset].heightMm;
+    }
+    updateSettingsFromInputs();
+    syncPaperPresetFromInputs();
+    setDirty(true);
+    schedulePreview();
+  });
+
+  [elements.paperWidth, elements.paperHeight].forEach((field) => {
+    field.addEventListener("input", () => {
+      updateSettingsFromInputs();
+      syncPaperPresetFromInputs();
+      setDirty(true);
+      schedulePreview();
+    });
+  });
+}
+
+function updatePreviewRulers(scale) {
+  if (!elements.previewRulerTop || !elements.previewRulerLeft) {
+    return;
+  }
+  if (!state.mmToPx) {
+    state.mmToPx = computeMmToPx();
+  }
+
+  const layout = resolvePageLayout(getSettingsForMode());
+  const pxPerCm = cmToPx(1) * scale;
+  const pageWidthPx = layout.paperWidthMm * state.mmToPx * scale;
+  const pageHeightPx = layout.paperHeightMm * state.mmToPx * scale;
+  const viewportInnerWidth = Math.max(0, elements.previewViewport.clientWidth - 24);
+  const frameLeftOffset = Math.max(0, (viewportInnerWidth - pageWidthPx) / 2);
+
+  elements.previewRulerTop.innerHTML = "";
+  elements.previewRulerLeft.innerHTML = "";
+
+  const maxCmX = Math.ceil(layout.paperWidthMm / 10);
+  for (let cm = 0; cm <= maxCmX; cm += 1) {
+    const pos = frameLeftOffset + cm * pxPerCm;
+    if (pos > frameLeftOffset + pageWidthPx + 1) {
+      break;
+    }
+    const tick = document.createElement("span");
+    tick.className = "ruler-tick ruler-tick--top";
+    tick.style.left = `${pos}px`;
+    const label = document.createElement("span");
+    label.className = "ruler-label";
+    label.textContent = String(cm);
+    tick.appendChild(label);
+    elements.previewRulerTop.appendChild(tick);
+  }
+
+  const maxCmY = Math.ceil(layout.paperHeightMm / 10);
+  for (let cm = 0; cm <= maxCmY; cm += 1) {
+    const pos = cm * pxPerCm;
+    if (pos > pageHeightPx + 1) {
+      break;
+    }
+    const tick = document.createElement("span");
+    tick.className = "ruler-tick ruler-tick--left";
+    tick.style.top = `${pos}px`;
+    const label = document.createElement("span");
+    label.className = "ruler-label";
+    label.textContent = String(cm);
+    tick.appendChild(label);
+    elements.previewRulerLeft.appendChild(tick);
+  }
+}
 function setupPreviewControls() {
   applyPreviewScale(elements.previewScale.value);
   elements.previewScale.addEventListener("input", (event) => {
@@ -2008,6 +1989,7 @@ function init() {
   setupImageControls();
   setupFontControls();
   setupStylePresets();
+  setupPageSettingsControls();
   setupPreviewControls();
   setupProjectControls();
   renderImageList();
